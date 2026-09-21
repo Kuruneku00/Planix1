@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:background="#020617"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp"
+    android:paddingTop="48dp"
+    android:paddingBottom="40dp"
+    android:layoutDirection="rtl">
+
+    <!-- Top Brand Header -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="32dp">
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@mipmap/ic_launcher"
+            android:contentDescription="Planix Logo" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Planix • پلنر هوشمند"
+            android:textColor="#C084FC"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginStart="10dp" />
+    </LinearLayout>
+
+    <!-- Large Current Time Clock -->
+    <TextView
+        android:id="@+id/alarm_clock_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="12:00"
+        android:textColor="#F8FAFC"
+        android:textSize="54sp"
+        android:fontFamily="sans-serif-black"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Pulsing Alarm Bell Icon Frame -->
+    <FrameLayout
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:layout_marginBottom="32dp">
+
+        <View
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:background="@drawable/alarm_glow_bg" />
+
+        <ImageView
+            android:id="@+id/alarm_icon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_notification"
+            android:tint="#A855F7"
+            android:contentDescription="Alarm Icon" />
+    </FrameLayout>
+
+    <!-- Item Title -->
+    <TextView
+        android:id="@+id/alarm_title_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="عنوان یادآور"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Item Subtitle / Category -->
+    <TextView
+        android:id="@+id/alarm_message_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="زمان سررسید فرا رسیده است"
+        android:textColor="#94A3B8"
+        android:textSize="15sp"
+        android:gravity="center"
+        android:maxLines="3"
+        android:ellipsize="end"
+        android:layout_marginBottom="24dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <!-- Stop Alarm Button (Primary) -->
+        <Button
+            android:id="@+id/btn_stop_alarm"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="توقف زنگ"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:background="@drawable/btn_stop_alarm_bg"
+            android:layout_marginBottom="14dp" />
+
+        <!-- Snooze 5 Min Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_snooze_5m"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="تعویق (۵ دقیقه)"
+                android:textColor="#CBD5E1"
+                android:textSize="13sp"
+                android:background="@drawable/btn_snooze_alarm_bg"
+                android:layout_marginEnd="6dp" />
+
+            <Button
+                android:id="@+id/btn_snooze_10m"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="تعویق (۱۰ دقیقه)"
+                android:textColor="#CBD5E1"
+                android:textSize="13sp"
+                android:background="@drawable/btn_snooze_alarm_bg"
+                android:layout_marginStart="6dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

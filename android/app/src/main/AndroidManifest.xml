@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Essential Android Native Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <!-- Android 13+ Notification Permission -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Exact Alarm & AlarmManager Permissions -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    
+    <!-- System Clock App Set Alarm Intent Permission -->
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+
+    <!-- Hardware Features & Continuous Audible Alarms -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" tools:targetApi="34" />
+
+    <!-- Media & Audio Selection via Storage Access Framework -->
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" tools:targetApi="33" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+
+    <!-- Package visibility queries for Clock and Alarm apps (Android 11+) -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.SET_ALARM" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SHOW_ALARMS" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SET_TIMER" />
+        </intent>
+        <package android:name="com.google.android.deskclock" />
+        <package android:name="com.sec.android.app.clockpackage" />
+        <package android:name="com.miui.deskclock" />
+        <package android:name="com.android.deskclock" />
+        <package android:name="com.coloros.alarm" />
+        <package android:name="com.oppo.alarm" />
+        <package android:name="com.oneplus.deskclock" />
+        <package android:name="com.asus.deskclock" />
+        <package android:name="com.transsion.deskclock" />
+        <package android:name="com.motorola.blur.alarmclock" />
+    </queries>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="Planix"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:usesCleartextTraffic="true">
+
+        <!-- Xiaomi MIUI display cutout / notch configuration -->
+        <meta-data
+            android:name="notch.config"
+            android:value="portrait|landscape" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/AppTheme.NoActionBarLaunch"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|smallestScreenSize|uiMode"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- Deep link / Custom URI scheme for Planner alarms -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="planner" />
+            </intent-filter>
+        </activity>
+
+        <!-- Full-Screen Native Alarm Activity for Lockscreen Display -->
+        <activity
+            android:name=".AlarmActivity"
+            android:exported="false"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:excludeFromRecents="true"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode="singleTask" />
+
+        <!-- Foreground Sound Service for Continuous Alarm Ringing -->
+        <service
+            android:name=".AlarmSoundService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <!-- Alarm Receiver for Scheduled Exact Alarms -->
+        <receiver
+            android:name=".AlarmReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.planner.smartapp.ACTION_ALARM_TRIGGER" />
+                <action android:name="com.planner.smartapp.ACTION_STOP_ALARM" />
+                <action android:name="com.planner.smartapp.ACTION_SNOOZE_ALARM" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Boot Receiver to Reschedule Alarms after Device Reboot -->
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>

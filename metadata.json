@@ -1,0 +1,10 @@
+{
+  "name": "Remix Planix",
+  "description": "Imported from GitHub: Kuruneku00/Planix.git",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

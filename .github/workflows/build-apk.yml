@@ -1,0 +1,171 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Verify Node.js and npm
+        shell: bash
+        run: |
+          set -e
+          node --version
+          npm --version
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Verify project structure
+        shell: bash
+        run: |
+          set -e
+
+          echo "Checking project structure..."
+
+          test -f package.json
+          test -f package-lock.json
+          test -d android
+          test -f android/gradlew
+          test -d android/app
+
+          echo "Project structure OK."
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          set -e
+          npm ci --no-audit --no-fund || npm install --no-audit --no-fund
+
+      - name: Verify Capacitor
+        shell: bash
+        run: |
+          set -e
+          npx cap --version
+
+      - name: Build web application
+        shell: bash
+        run: |
+          set -e
+          npm run build
+
+      - name: Verify web build
+        shell: bash
+        run: |
+          set -e
+
+          if [ ! -f dist/index.html ]; then
+            echo "ERROR: dist/index.html was not created."
+            exit 1
+          fi
+
+          echo "Web build verified successfully."
+          find dist -maxdepth 3 -type f -print
+
+      - name: Sync Capacitor
+        shell: bash
+        run: |
+          set -e
+          npx cap sync android
+
+      - name: Configure Android SDK
+        shell: bash
+        run: |
+          set -e
+
+          if [ -n "$ANDROID_HOME" ]; then
+            SDK_PATH="$ANDROID_HOME"
+          elif [ -n "$ANDROID_SDK_ROOT" ]; then
+            SDK_PATH="$ANDROID_SDK_ROOT"
+          else
+            echo "ERROR: Android SDK was not found."
+            exit 1
+          fi
+
+          echo "sdk.dir=$SDK_PATH" > android/local.properties
+
+          echo "Android SDK configured:"
+          cat android/local.properties
+
+      - name: Prepare Gradle
+        shell: bash
+        run: |
+          set -e
+
+          cd android
+
+          chmod +x gradlew
+
+          echo "Gradle wrapper configuration:"
+          cat gradle/wrapper/gradle-wrapper.properties
+
+          echo ""
+          echo "Gradle version:"
+          ./gradlew --version
+
+      - name: Build Debug APK
+        working-directory: android
+        shell: bash
+        run: |
+          set -e
+
+          chmod +x gradlew
+
+          ./gradlew assembleDebug \
+            --stacktrace \
+            --info \
+            --console=plain \
+            --warning-mode=all \
+            --no-daemon
+
+      - name: Verify APK
+        shell: bash
+        run: |
+          set -e
+
+          APK=$(find android/app/build/outputs/apk/debug \
+            -type f \
+            -name "*.apk" \
+            | head -n 1)
+
+          if [ -z "$APK" ]; then
+            echo "ERROR: APK was not generated."
+            echo "Searching for APK files:"
+            find android -type f -name "*.apk" -print || true
+            exit 1
+          fi
+
+          echo "APK generated successfully:"
+          ls -lh "$APK"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Planix-debug-apk
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 14

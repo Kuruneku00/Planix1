@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Main stem gradient: vibrant violet to soft orchid -->
+    <linearGradient id="stemGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED" />
+      <stop offset="40%" stop-color="#8B5CF6" />
+      <stop offset="75%" stop-color="#A855F7" />
+      <stop offset="100%" stop-color="#D8B4FE" />
+    </linearGradient>
+
+    <!-- Top fold gradient -->
+    <linearGradient id="topFoldGrad" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#6D28D9" />
+      <stop offset="30%" stop-color="#8B5CF6" />
+      <stop offset="70%" stop-color="#A855F7" />
+      <stop offset="100%" stop-color="#C084FC" />
+    </linearGradient>
+
+    <!-- Outer right loop gradient: glossy lavender curve -->
+    <linearGradient id="outerLoopGrad" x1="20%" y1="0%" x2="90%" y2="90%">
+      <stop offset="0%" stop-color="#DDD6FE" />
+      <stop offset="25%" stop-color="#C084FC" />
+      <stop offset="60%" stop-color="#9333EA" />
+      <stop offset="100%" stop-color="#581C87" />
+    </linearGradient>
+
+    <!-- Under-fold shadow loop: deep rich indigo to violet -->
+    <linearGradient id="underLoopGrad" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3B0764" />
+      <stop offset="40%" stop-color="#4C1D95" />
+      <stop offset="75%" stop-color="#6D28D9" />
+      <stop offset="100%" stop-color="#7C3AED" />
+    </linearGradient>
+
+    <!-- Inside Tick mark gradient -->
+    <linearGradient id="tickGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6D28D9" />
+      <stop offset="50%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#C084FC" />
+    </linearGradient>
+
+    <!-- Subtle soft glow drop filter for depth -->
+    <filter id="softShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#4C1D95" flood-opacity="0.28" />
+    </filter>
+  </defs>
+
+  <!-- Group with soft shadow -->
+  <g filter="url(#softShadow)">
+    <!-- 1. Under-fold shadow of the loop curving back into the stem -->
+    <path d="M 445 615 C 550 610 650 560 670 480 C 690 410 635 345 540 345 C 470 345 440 375 440 435 C 440 505 442 560 445 615 Z" 
+          fill="url(#underLoopGrad)" />
+
+    <!-- 2. Bottom curve of the loop returning to the stem -->
+    <path d="M 445 575 C 510 575 580 550 630 500 C 665 460 650 400 580 400 C 510 400 450 440 445 575 Z" 
+          fill="url(#underLoopGrad)" opacity="0.9" />
+
+    <!-- 3. Outer curved loop of the letter P -->
+    <path d="M 425 245 C 550 245 680 270 710 380 C 735 460 690 535 600 580 C 530 615 450 610 445 610 C 490 580 570 550 620 500 C 665 455 675 390 625 330 C 570 275 490 275 425 285 Z" 
+          fill="url(#outerLoopGrad)" />
+
+    <!-- 4. Top horizontal fold ribbon -->
+    <path d="M 320 248 C 360 245 420 245 480 248 C 555 252 645 280 695 350 C 665 300 595 270 515 260 C 445 252 380 252 320 248 Z" 
+          fill="url(#topFoldGrad)" />
+
+    <!-- 5. Top Left flare / curl of the ribbon -->
+    <path d="M 320 248 C 360 250 400 270 425 320 C 435 340 435 370 425 400 C 415 350 380 300 320 248 Z" 
+          fill="#5B21B6" opacity="0.6" />
+
+    <!-- 6. Left vertical stem of the P (Rounded pill capsule) -->
+    <path d="M 330 430 C 330 365 375 320 425 320 C 440 320 445 330 445 350 L 445 680 C 445 745 400 790 350 790 C 335 790 330 780 330 760 L 330 430 Z" 
+          fill="url(#stemGrad)" />
+
+    <!-- 7. Smooth highlight along the left edge of the vertical stem -->
+    <path d="M 338 440 C 338 385 365 345 405 335 C 385 350 348 395 348 455 L 348 720 C 348 745 360 765 375 775 C 355 770 338 750 338 725 L 338 440 Z" 
+          fill="#FFFFFF" opacity="0.22" />
+
+    <!-- 8. Central angled Checkmark (Tick ✓) nestled in the loop -->
+    <path d="M 465 450 C 472 443 484 443 491 450 L 518 477 C 525 484 537 484 544 477 L 590 415 C 597 406 610 406 618 414 C 626 422 626 435 617 444 L 548 522 C 538 534 520 534 510 522 L 465 473 C 458 466 458 456 465 450 Z" 
+          fill="url(#tickGrad)" />
+  </g>
+</svg>
