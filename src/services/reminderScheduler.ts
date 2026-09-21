@@ -267,7 +267,7 @@ class ReminderScheduler {
     // 3. Trigger Native Android Alarm Sound Service (plays in USAGE_ALARM, audible even in Silent mode!)
     nativeBridge.triggerImmediateAlarm(alarm.title, alarm.subtitle, alarm.targetView);
 
-    // 4. Deliver Real System Notification + Persistent DB Record via NotificationService
+    // 4. Deliver Real System Notification via NotificationService directly to phone
     if (typeof window !== 'undefined') {
       import('./notificationService').then(({ notificationService }) => {
         const notifType =
@@ -292,13 +292,6 @@ class ReminderScheduler {
         });
       });
     }
-
-    // 5. Notify active subscribers (In-App Alarm Banner with Stop & Snooze buttons)
-    this.listeners.forEach((listener) => {
-      try {
-        listener(alarm);
-      } catch {}
-    });
   }
 
   /**

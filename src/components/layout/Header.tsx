@@ -39,19 +39,14 @@ export const Header: React.FC<HeaderProps> = ({ onMobileMenuToggle }) => {
     activeView,
     openGlobalSearch,
     openQuickAdd,
-    setNotificationCenterOpen,
+    openMascotTour,
     settings,
     updateSettings,
-    refreshTrigger,
     pomodoroIsRunning,
     pomodoroSecondsLeft,
     pomodoroMode,
     setActiveView,
   } = useApp();
-
-  const unreadNotificationsCount = React.useMemo(() => {
-    return db.getNotifications().filter((n) => !n.read).length;
-  }, [refreshTrigger]);
 
   const viewTitles: Record<string, { title: string; icon: React.ComponentType<{ className?: string }> }> = {
     dashboard: { title: 'داشبورد اصلی', icon: LayoutDashboard },
@@ -90,7 +85,7 @@ export const Header: React.FC<HeaderProps> = ({ onMobileMenuToggle }) => {
   return (
     <header
       id="main-header"
-      className="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 flex items-center justify-between shrink-0 z-20 px-3 sm:px-6 transition-all"
+      className="bg-white/95 dark:bg-[#060813]/95 backdrop-blur-md border-b border-slate-200/90 dark:border-[#161c2e] flex items-center justify-between shrink-0 z-20 px-3 sm:px-6 transition-colors duration-200"
       style={{
         minHeight: '3.5rem',
       }}
@@ -101,18 +96,18 @@ export const Header: React.FC<HeaderProps> = ({ onMobileMenuToggle }) => {
         <button
           type="button"
           onClick={onMobileMenuToggle}
-          className="lg:hidden p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition cursor-pointer shrink-0"
+          className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition cursor-pointer shrink-0"
           title="منوی اصلی"
         >
           <Menu className="w-5 h-5" />
         </button>
 
         <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
-          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-purple-950/60 border border-purple-800/40 text-purple-400 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200/70 dark:border-purple-800/40 text-[#8B3DFF] flex items-center justify-center shrink-0">
             <CurrentIcon className="w-4 h-4" />
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="text-sm sm:text-base font-bold text-slate-100 leading-tight truncate">
+            <h1 className="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-100 leading-tight truncate">
               {currentViewInfo.title}
             </h1>
             <p className="text-[10px] sm:text-[11px] text-slate-400 hidden sm:block truncate">{todayJalaliFormatted}</p>
@@ -120,89 +115,74 @@ export const Header: React.FC<HeaderProps> = ({ onMobileMenuToggle }) => {
         </div>
       </div>
 
-      {/* Left side: Actions, Search, Pomodoro Pill, Notifications, Quick Add */}
+      {/* Left side (In RTL: Search -> Mascot Fox Guide -> Quick Add (+) -> Notifications -> Theme Toggle) */}
       <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-        {/* Active Pomodoro Pill */}
+        {/* Active Pomodoro Pill (if running) */}
         {pomodoroIsRunning && (
           <button
             type="button"
             onClick={() => setActiveView('pomodoro')}
-            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-purple-950/80 border border-purple-700/60 text-purple-300 text-[11px] sm:text-xs font-mono font-bold animate-pulse hover:bg-purple-900 transition cursor-pointer shadow-sm shrink-0"
+            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-purple-100 dark:bg-purple-950/80 border border-purple-300 dark:border-purple-700/60 text-purple-700 dark:text-purple-300 text-[11px] sm:text-xs font-mono font-bold animate-pulse hover:bg-purple-200 dark:hover:bg-purple-900 transition cursor-pointer shadow-sm shrink-0"
             title="تایمر تمرکز فعال"
           >
-            <Timer className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+            <Timer className="w-3.5 h-3.5 text-[#8B3DFF] shrink-0" />
             <span className="whitespace-nowrap">
               {settings.persianDigits ? toPersianDigits(timeFormatted) : timeFormatted}
             </span>
           </button>
         )}
 
-        {/* Global Search Button (Desktop) */}
-        <button
-          id="global-search-trigger"
-          type="button"
-          onClick={openGlobalSearch}
-          className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/60 text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition text-xs cursor-pointer group shrink-0"
-        >
-          <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-purple-400" />
-          <span>جستجو در همه بخش‌ها...</span>
-          <kbd className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-700 text-[10px] text-slate-400 font-mono">
-            Ctrl K
-          </kbd>
-        </button>
-
-        {/* Mobile Search Icon */}
+        {/* Search Icon / Button */}
         <button
           type="button"
           onClick={openGlobalSearch}
-          className="md:hidden p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition cursor-pointer shrink-0"
+          className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition cursor-pointer shrink-0"
           title="جستجو"
         >
-          <Search className="w-4 h-4 sm:w-5 sm:h-5" />
+          <Search className="w-5 h-5" />
         </button>
 
-        {/* Mascot Tour & Guide Trigger */}
-        <MascotHelpButton />
+        {/* Mascot Avatar Guide Button: Exactly like screenshots */}
+        <button
+          id="header-mascot-guide-btn"
+          type="button"
+          onClick={() => openMascotTour(0)}
+          className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full p-0.5 bg-gradient-to-tr from-amber-400 via-orange-400 to-amber-500 border border-orange-400/60 shadow-sm hover:scale-105 active:scale-95 transition cursor-pointer shrink-0"
+          title="راهنمای جامع برنامه (ممد راهنما)"
+        >
+          <div className="w-full h-full rounded-full overflow-hidden bg-white dark:bg-slate-900 flex items-center justify-center">
+            <img
+              src="/mascot.png"
+              alt="راهنمای برنامه"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          {/* Orange alert dot matching screenshot */}
+          <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-amber-500 border-2 border-white dark:border-[#060813]" />
+        </button>
 
-        {/* Quick Add Button */}
+        {/* Circular Quick Add (+) Button */}
         <button
           id="quick-add-btn"
           type="button"
           onClick={() => openQuickAdd('task')}
-          className="flex items-center gap-1 sm:gap-1.5 p-2 sm:px-3 sm:py-1.5 rounded-xl bg-[#8B3DFF] hover:bg-[#7430D9] text-white font-medium text-xs sm:text-sm shadow-md shadow-[#8B3DFF]/30 transition cursor-pointer active:scale-95 shrink-0"
+          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#8B3DFF] hover:bg-[#7430D9] text-white flex items-center justify-center shadow-md shadow-purple-600/30 transition cursor-pointer active:scale-95 shrink-0"
           title="ایجاد جدید"
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
-          <span className="hidden sm:inline">ایجاد جدید</span>
         </button>
 
-        {/* Notifications Center */}
-        <button
-          id="notifications-trigger"
-          type="button"
-          onClick={() => setNotificationCenterOpen(true)}
-          className="relative p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition cursor-pointer shrink-0"
-          title="اعلان‌ها"
-        >
-          <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
-          {unreadNotificationsCount > 0 && (
-            <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center ring-2 ring-slate-900">
-              {settings.persianDigits ? toPersianDigits(unreadNotificationsCount) : unreadNotificationsCount}
-            </span>
-          )}
-        </button>
-
-        {/* Theme Toggle */}
+        {/* Theme Toggle (Far left in RTL) */}
         <button
           type="button"
           onClick={toggleTheme}
-          className="p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition cursor-pointer shrink-0"
+          className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition cursor-pointer shrink-0"
           title={settings.theme === 'dark' ? 'حالت روشن' : 'حالت تاریک'}
         >
           {settings.theme === 'dark' ? (
-            <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
+            <Sun className="w-5 h-5 text-amber-400" />
           ) : (
-            <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
+            <Moon className="w-5 h-5 text-[#8B3DFF]" />
           )}
         </button>
       </div>

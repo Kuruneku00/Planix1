@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
+
 @theme {
   --font-sans: 'Vazirmatn', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-serif: 'Vazirmatn', serif;
@@ -57,11 +59,16 @@ html, body, #root {
   overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  background-color: #020617 !important;
+}
+
+html.dark, html.dark body, html.dark #root, [data-theme="dark"], [data-theme="dark"] body, [data-theme="dark"] #root {
+  background-color: #060813 !important;
+  color: #f8fafc !important;
 }
 
 html.light, html.light body, html.light #root, [data-theme="light"], [data-theme="light"] body, [data-theme="light"] #root {
-  background-color: #f8fafc !important;
+  background-color: #F4F6FA !important;
+  color: #1E293B !important;
 }
 
 @keyframes splashProgress {

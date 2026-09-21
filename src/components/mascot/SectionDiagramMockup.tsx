@@ -25,25 +25,46 @@ interface SectionDiagramMockupProps {
   viewKey: ActiveView;
   activeCalloutId?: string | null;
   onSelectCallout?: (calloutId: string) => void;
+  isLight?: boolean;
 }
 
 export const SectionDiagramMockup: React.FC<SectionDiagramMockupProps> = ({
   viewKey,
   activeCalloutId,
   onSelectCallout,
+  isLight = false,
 }) => {
   return (
-    <div className="relative w-full rounded-2xl bg-[#131722]/90 border border-slate-800/80 p-3 sm:p-3.5 text-slate-100 select-none mx-auto" dir="rtl">
+    <div
+      className={`relative w-full rounded-2xl p-3 sm:p-3.5 select-none mx-auto transition-colors ${
+        isLight
+          ? 'bg-white border border-[#e2e7f6] text-slate-800 shadow-sm'
+          : 'bg-[#131722]/90 border border-slate-800/80 text-slate-100'
+      }`}
+      dir="rtl"
+    >
       
       {/* Visual Window Bar */}
-      <div className="flex items-center justify-between pb-1 mb-1.5 border-b border-slate-800/80 text-[10px] text-slate-400">
+      <div
+        className={`flex items-center justify-between pb-1 mb-1.5 border-b text-[10px] ${
+          isLight ? 'border-[#e2e7f6] text-slate-500' : 'border-slate-800/80 text-slate-400'
+        }`}
+      >
         <div className="flex items-center gap-1">
           <span className="w-2 h-2 rounded-full bg-rose-500/80 inline-block" />
           <span className="w-2 h-2 rounded-full bg-amber-500/80 inline-block" />
           <span className="w-2 h-2 rounded-full bg-emerald-500/80 inline-block" />
-          <span className="mr-1.5 font-mono text-[9px] text-purple-300">planix://{viewKey}</span>
+          <span className={`mr-1.5 font-mono text-[9px] ${isLight ? 'text-[#7059f6]' : 'text-purple-300'}`}>
+            planix://{viewKey}
+          </span>
         </div>
-        <span className="text-[9px] bg-purple-950/80 text-purple-300 border border-purple-800/50 px-1.5 py-0.2 rounded-md font-bold">
+        <span
+          className={`text-[9px] px-1.5 py-0.5 rounded-md font-bold border ${
+            isLight
+              ? 'bg-[#edf0ff] text-[#4f3ff5] border-[#dce2fc]'
+              : 'bg-purple-950/80 text-purple-300 border-purple-800/50'
+          }`}
+        >
           نمای شماتیک بخش
         </span>
       </div>
@@ -79,52 +100,84 @@ export const SectionDiagramMockup: React.FC<SectionDiagramMockupProps> = ({
         <div className="space-y-2.5 relative text-xs">
           {/* Row 1: Header with date, greeting and mascot */}
           <div className="flex items-center justify-between pb-1">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1e2333] border border-slate-700/60 text-slate-300 text-[11px] cursor-pointer hover:border-purple-500/40">
+            <div
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] cursor-pointer border ${
+                isLight
+                  ? 'bg-[#edf0ff] border-[#dce2fc] text-[#4f3ff5]'
+                  : 'bg-[#1e2333] border-slate-700/60 text-slate-300 hover:border-purple-500/40'
+              }`}
+            >
               <span className="text-xs">🦊</span>
-              <span>روباه راهنما</span>
-              <span className="text-slate-500 text-[10px] mr-1">‹</span>
+              <span>ممد راهنما</span>
+              <span className={`text-[10px] mr-1 ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>‹</span>
             </div>
-            <div className="flex items-center gap-1.5 text-slate-400 text-[11px]">
+            <div className={`flex items-center gap-1.5 text-[11px] ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
               <span>سه شنبه ۲۴ شهریور ۱۴۰۵</span>
-              <CalendarIcon className="w-3.5 h-3.5 text-slate-400" />
+              <CalendarIcon className="w-3.5 h-3.5" />
             </div>
           </div>
 
           {/* User greeting */}
           <div className="text-right">
-            <h4 className="text-sm sm:text-base font-black text-white">سلام کاربر گرامی، روزت بخیر!</h4>
+            <h4 className={`text-sm sm:text-base font-black ${isLight ? 'text-slate-900' : 'text-white'}`}>
+              سلام کاربر گرامی، روزت بخیر!
+            </h4>
           </div>
 
           {/* Action Buttons: 2 large buttons (Start Focus & New Task) */}
           <div className="grid grid-cols-2 gap-2.5">
             {/* Primary button: + وظیفه جدید */}
-            <div className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-md shadow-purple-600/30 cursor-pointer">
+            <div
+              className={`py-2.5 px-3 rounded-xl font-black text-xs flex items-center justify-center gap-1.5 shadow-md cursor-pointer ${
+                isLight
+                  ? 'bg-[#7059f6] text-white shadow-[#7059f6]/30'
+                  : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-purple-600/30'
+              }`}
+            >
               <span>+ وظیفه جدید</span>
             </div>
             {/* Secondary button: شروع تمرکز */}
-            <div className="py-2.5 px-3 rounded-xl bg-[#1e2333] border border-slate-700/80 text-slate-200 text-xs font-bold flex items-center justify-between px-3 cursor-pointer">
-              <span className="text-slate-500 text-xs">‹</span>
+            <div
+              className={`py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-between px-3 cursor-pointer ${
+                isLight
+                  ? 'bg-white border-[#dce2fc] text-[#4f3ff5]'
+                  : 'bg-[#1e2333] border-slate-700/80 text-slate-200'
+              }`}
+            >
+              <span className={`text-xs ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>‹</span>
               <div className="flex items-center gap-1.5">
                 <span>شروع تمرکز</span>
-                <Timer className="w-3.5 h-3.5 text-slate-300" />
+                <Timer className={`w-3.5 h-3.5 ${isLight ? 'text-[#7059f6]' : 'text-slate-300'}`} />
               </div>
             </div>
           </div>
 
           {/* Two Sub-buttons: وظایف امروز / رویدادها */}
           <div className="grid grid-cols-2 gap-2.5">
-            <div className="py-2 px-3 rounded-xl bg-[#181c28] border border-slate-800/80 text-slate-300 text-[11px] font-semibold flex items-center justify-between cursor-pointer">
-              <span className="text-slate-500 text-xs">‹</span>
+            <div
+              className={`py-2 px-3 rounded-xl border text-[11px] font-semibold flex items-center justify-between cursor-pointer ${
+                isLight
+                  ? 'bg-[#f8f9fe] border-[#e2e6f4] text-slate-700'
+                  : 'bg-[#181c28] border-slate-800/80 text-slate-300'
+              }`}
+            >
+              <span className={`text-xs ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>‹</span>
               <div className="flex items-center gap-1.5">
                 <span>وظایف امروز</span>
-                <CheckSquare className="w-3.5 h-3.5 text-purple-400" />
+                <CheckSquare className={`w-3.5 h-3.5 ${isLight ? 'text-[#7059f6]' : 'text-purple-400'}`} />
               </div>
             </div>
-            <div className="py-2 px-3 rounded-xl bg-[#181c28] border border-slate-800/80 text-slate-300 text-[11px] font-semibold flex items-center justify-between cursor-pointer">
-              <span className="text-slate-500 text-xs">‹</span>
+            <div
+              className={`py-2 px-3 rounded-xl border text-[11px] font-semibold flex items-center justify-between cursor-pointer ${
+                isLight
+                  ? 'bg-[#f8f9fe] border-[#e2e6f4] text-slate-700'
+                  : 'bg-[#181c28] border-slate-800/80 text-slate-300'
+              }`}
+            >
+              <span className={`text-xs ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>‹</span>
               <div className="flex items-center gap-1.5">
                 <span>رویدادها</span>
-                <CalendarIcon className="w-3.5 h-3.5 text-indigo-400" />
+                <CalendarIcon className={`w-3.5 h-3.5 ${isLight ? 'text-indigo-500' : 'text-indigo-400'}`} />
               </div>
             </div>
           </div>

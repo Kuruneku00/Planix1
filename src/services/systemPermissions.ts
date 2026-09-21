@@ -413,9 +413,18 @@ class SystemPermissionsService {
       return true;
     }
 
-    // 1. Verify notification permission is granted
-    if (!('Notification' in window) || Notification.permission !== 'granted') {
-      console.warn('[SystemPermissions] Notification permission not granted:', Notification?.permission);
+    // 1. Verify notification permission is granted, or prompt if default
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      if (Notification.permission === 'default') {
+        try {
+          await Notification.requestPermission();
+        } catch {}
+      }
+      if (Notification.permission !== 'granted') {
+        console.warn('[SystemPermissions] Notification permission not granted:', Notification?.permission);
+        return false;
+      }
+    } else {
       return false;
     }
 

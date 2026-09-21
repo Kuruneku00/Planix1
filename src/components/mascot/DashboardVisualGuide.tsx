@@ -109,14 +109,14 @@ export const DashboardVisualGuide: React.FC<DashboardVisualGuideProps> = ({
           
           {/* ========================================================
               LEFT COLUMN ANNOTATIONS (on lg screens)
-              1. روباه راهنما
+              1. ممد راهنما
               2. رویدادها
               3. عادت‌ها
               4. روباه انگیزشی
               ======================================================== */}
           <div className="hidden lg:flex lg:col-span-3 flex-col gap-14 pt-8 text-right pr-2">
             
-            {/* 1. روباه راهنما */}
+            {/* 1. ممد راهنما */}
             <div
               onMouseEnter={() => setActiveHighlight('mascot-guide')}
               onMouseLeave={() => setActiveHighlight(null)}
@@ -125,7 +125,7 @@ export const DashboardVisualGuide: React.FC<DashboardVisualGuideProps> = ({
               }`}
             >
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-extrabold text-purple-300">روباه راهنما</span>
+                <span className="text-sm font-extrabold text-purple-300">ممد راهنما</span>
                 {/* Curved Arrow pointing to the top fox banner */}
                 <svg width="32" height="28" viewBox="0 0 32 28" fill="none" className="text-purple-400">
                   <path d="M 4 8 C 16 8, 26 14, 28 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
@@ -619,7 +619,7 @@ export const DashboardVisualGuide: React.FC<DashboardVisualGuideProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {[
-              { id: 'mascot-guide', title: 'روباه راهنما', desc: 'همیشه در کنار توست و با پیام‌های انگیزشی و دوستانه، برنامه‌هات را بهتر پیش می‌برد.' },
+              { id: 'mascot-guide', title: 'ممد راهنما', desc: 'همیشه در کنار توست و با پیام‌های انگیزشی و دوستانه، برنامه‌هات را بهتر پیش می‌برد.' },
               { id: 'focus-btn', title: 'شروع تمرکز', desc: 'برای تمرکز روی کارهای مهمت و بدون حواس‌پرتی.' },
               { id: 'new-task-btn', title: 'وظیفه جدید', desc: 'افزودن سریع وظایف و برنامه‌های روزانه.' },
               { id: 'tasks-card', title: 'وظایف امروز', desc: 'لیست کارهایی که امروز باید انجام شوند.' },

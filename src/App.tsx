@@ -4,15 +4,13 @@ import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { MobileNav } from './components/layout/MobileNav';
 
-// Global Modals & Notifications
+// Global Modals
 import { QuickAddModal } from './components/layout/QuickAddModal';
 import { GlobalSearchModal } from './components/layout/GlobalSearchModal';
-import { NotificationCenterModal } from './components/layout/NotificationCenterModal';
 import { MascotTourModal } from './components/mascot/MascotTourModal';
 import { PersistentMascotWidget } from './components/mascot/PersistentMascotWidget';
 import { ToastContainer } from './components/common/ToastContainer';
 import { ConfirmationModal } from './components/common/ConfirmationModal';
-import { ActiveAlarmBanner } from './components/common/ActiveAlarmBanner';
 import { PermissionSetupModal } from './components/common/PermissionSetupModal';
 
 // Authentication, Permissions & Onboarding Lifecycle
@@ -100,7 +98,7 @@ const MainLayout: React.FC = () => {
   return (
     <div
       id="planner-root"
-      className="relative w-full h-full flex bg-slate-950 text-slate-100 font-sans overflow-hidden select-none"
+      className="relative w-full h-full flex bg-[#f3f5fa] dark:bg-[#060813] text-slate-800 dark:text-slate-100 font-sans overflow-hidden select-none transition-colors duration-200"
       dir="rtl"
     >
       {/* Persistent Desktop & Tablet Sidebar (Hidden when strict lock is active) */}
@@ -151,14 +149,10 @@ const MainLayout: React.FC = () => {
         <MobileNav drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} />
       )}
 
-      {/* Active High-Priority Alarm Alert Banner */}
-      <ActiveAlarmBanner />
-
       {/* Global Modals */}
       <PermissionSetupModal />
       <QuickAddModal />
       <GlobalSearchModal />
-      <NotificationCenterModal />
       {/* Mascot Companions: Corner widget & Step-by-Step interactive tour */}
       <PersistentMascotWidget />
       <MascotTourModal />
@@ -173,7 +167,7 @@ const MainLayout: React.FC = () => {
 };
 
 const AppContent: React.FC = () => {
-  const { settings } = useApp();
+  const { settings, openMascotTour } = useApp();
   const [isSplashDone, setIsSplashDone] = React.useState<boolean>(false);
 
   // Initialize central Viewport & Safe Area sync across all lifecycle states
@@ -198,7 +192,13 @@ const AppContent: React.FC = () => {
   if (!settings.isLoggedIn) {
     return (
       <>
-        <LoginScreen onComplete={() => {}} />
+        <LoginScreen
+          onComplete={() => {
+            setTimeout(() => {
+              openMascotTour(0);
+            }, 250);
+          }}
+        />
         <ToastContainer />
       </>
     );

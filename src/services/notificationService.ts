@@ -128,17 +128,20 @@ class NotificationService {
     targetView?: ActiveView | string;
     sourceId?: string;
   }): Promise<NotificationItem> {
-    const item = this.createNotification({
-      title: params.title,
-      message: params.message,
+    const item: NotificationItem = {
+      id: params.id || `notif_${Date.now()}`,
+      title: params.title.trim(),
+      message: params.message.trim(),
       type: params.type || 'reminder',
+      read: true,
+      targetView: params.targetView || 'reminders',
+      timestamp: new Date().toISOString(),
       timeStr: params.timeStr,
       dateStr: params.dateStr,
-      targetView: params.targetView,
       sourceId: params.sourceId,
-    });
+    };
 
-    // Fire real OS notification
+    // Fire real Phone / OS system notification directly
     await systemPermissions.showSystemNotification({
       title: params.title,
       body: params.message,

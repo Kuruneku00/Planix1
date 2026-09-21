@@ -79,7 +79,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ drawerOpen, setDrawerOpen 
       {/* Bottom Navigation Bar for Mobile: 5 symmetric items with + strictly centered */}
       <div
         id="mobile-bottom-nav"
-        className="lg:hidden fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 z-40 grid grid-cols-5 items-center px-1"
+        className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-[#060813] backdrop-blur-md border-t border-slate-200 dark:border-[#161c2e] z-40 grid grid-cols-5 items-center px-1"
         style={{
           paddingBottom: 'var(--safe-bottom)',
           height: 'calc(4rem + var(--safe-bottom))',
@@ -94,7 +94,9 @@ export const MobileNav: React.FC<MobileNavProps> = ({ drawerOpen, setDrawerOpen 
             handleSetDrawerOpen(false);
           }}
           className={`flex flex-col items-center justify-center gap-1 h-full transition cursor-pointer ${
-            activeView === 'dashboard' ? 'text-purple-400 font-bold' : 'text-slate-400 hover:text-slate-200'
+            activeView === 'dashboard'
+              ? 'text-[#8B3DFF] font-bold'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
         >
           <LayoutDashboard className="w-5 h-5" />
@@ -109,7 +111,9 @@ export const MobileNav: React.FC<MobileNavProps> = ({ drawerOpen, setDrawerOpen 
             handleSetDrawerOpen(false);
           }}
           className={`flex flex-col items-center justify-center gap-1 h-full transition cursor-pointer ${
-            activeView === 'tasks' ? 'text-purple-400 font-bold' : 'text-slate-400 hover:text-slate-200'
+            activeView === 'tasks'
+              ? 'text-[#8B3DFF] font-bold'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
         >
           <CheckSquare className="w-5 h-5" />
@@ -122,10 +126,10 @@ export const MobileNav: React.FC<MobileNavProps> = ({ drawerOpen, setDrawerOpen 
             id="mobile-center-add-btn"
             type="button"
             onClick={() => openQuickAdd()}
-            className="relative -top-3.5 w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#8B3DFF] to-[#A970FF] hover:from-[#7430D9] hover:to-[#8B3DFF] text-white flex items-center justify-center shadow-lg shadow-[#8B3DFF]/40 border-2 border-white dark:border-slate-900 transition active:scale-90 cursor-pointer"
+            className="relative -top-3 w-12 h-12 rounded-2xl bg-[#8B3DFF] hover:bg-[#7430D9] text-white flex items-center justify-center shadow-lg shadow-purple-600/40 transition active:scale-90 cursor-pointer"
             title="ایجاد سریع (+)"
           >
-            <Plus className="w-6 h-6 stroke-[2.5]" />
+            <Plus className="w-6 h-6 stroke-[3]" />
           </button>
         </div>
 
@@ -137,7 +141,9 @@ export const MobileNav: React.FC<MobileNavProps> = ({ drawerOpen, setDrawerOpen 
             handleSetDrawerOpen(false);
           }}
           className={`flex flex-col items-center justify-center gap-1 h-full transition cursor-pointer ${
-            activeView === 'calendar' ? 'text-purple-400 font-bold' : 'text-slate-400 hover:text-slate-200'
+            activeView === 'calendar'
+              ? 'text-[#8B3DFF] font-bold'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
         >
           <CalendarIcon className="w-5 h-5" />
@@ -149,7 +155,9 @@ export const MobileNav: React.FC<MobileNavProps> = ({ drawerOpen, setDrawerOpen 
           type="button"
           onClick={() => handleSetDrawerOpen(!isDrawerOpen)}
           className={`flex flex-col items-center justify-center gap-1 h-full transition cursor-pointer ${
-            isDrawerOpen ? 'text-purple-400 font-bold' : 'text-slate-400 hover:text-slate-200'
+            isDrawerOpen
+              ? 'text-[#8B3DFF] font-bold'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
         >
           <Menu className="w-5 h-5" />
@@ -166,7 +174,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ drawerOpen, setDrawerOpen 
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => handleSetDrawerOpen(false)}
-              className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm"
+              className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm"
             />
 
             <motion.div
@@ -174,37 +182,37 @@ export const MobileNav: React.FC<MobileNavProps> = ({ drawerOpen, setDrawerOpen 
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 right-0 w-80 max-w-[85vw] bg-slate-900 border-l border-slate-800 flex flex-col z-10 shadow-2xl"
+              className="fixed inset-y-0 right-0 w-80 max-w-[85vw] bg-white dark:bg-[#060813] border-l border-slate-200 dark:border-[#161c2e] text-slate-800 dark:text-slate-100 flex flex-col z-10 shadow-2xl transition-colors duration-200"
             >
               {/* Drawer Header */}
               <div
-                className="px-4 flex items-center justify-between border-b border-slate-800 shrink-0"
+                className="px-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 shrink-0"
                 style={{
                   paddingTop: 'var(--safe-top)',
                   minHeight: 'calc(3.5rem + var(--safe-top))',
                 }}
               >
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-purple-950/60 border border-purple-800/40 text-purple-400 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200/70 dark:border-purple-800/40 text-[#8B3DFF] flex items-center justify-center shrink-0">
                     <Grid className="w-4 h-4" />
                   </div>
-                  <span className="font-extrabold text-sm text-slate-100">منوی بخش‌ها</span>
+                  <span className="font-extrabold text-sm text-slate-800 dark:text-slate-100">منوی بخش‌ها</span>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={toggleTheme}
-                    className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition cursor-pointer"
+                    className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
                     title={settings.theme === 'dark' ? 'تم روشن' : 'تم تاریک'}
                   >
-                    {settings.theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-purple-400" />}
+                    {settings.theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-[#8B3DFF]" />}
                   </button>
 
                   <button
                     type="button"
                     onClick={() => handleSetDrawerOpen(false)}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition cursor-pointer"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                     title="بستن منو"
                   >
                     <X className="w-5 h-5" />
@@ -219,19 +227,19 @@ export const MobileNav: React.FC<MobileNavProps> = ({ drawerOpen, setDrawerOpen 
                     handleSetDrawerOpen(false);
                     openMascotTour(0);
                   }}
-                  className="p-3 rounded-2xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/70 hover:border-purple-500/50 transition flex items-center gap-3 cursor-pointer shadow-sm group"
+                  className="p-3 rounded-2xl bg-purple-50 dark:bg-slate-800/60 hover:bg-purple-100/70 dark:hover:bg-slate-800 border border-purple-200 dark:border-slate-700/70 hover:border-purple-400 transition flex items-center gap-3 cursor-pointer shadow-sm group"
                 >
                   <MascotAvatar size="sm" animated={true} />
                   <div className="flex-1 min-w-0 text-right">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-slate-200 group-hover:text-purple-300">
+                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#8B3DFF]">
                         راهنمای بخش‌ها 🦊
                       </span>
-                      <span className="px-1.5 py-0.2 rounded-md bg-purple-500/20 text-[9px] text-purple-300 font-bold">
+                      <span className="px-1.5 py-0.2 rounded-md bg-[#8B3DFF]/15 text-[9px] text-[#8B3DFF] font-bold">
                         تور
                       </span>
                     </div>
-                    <p className="text-[10px] text-slate-400 leading-tight mt-0.5 truncate">
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5 truncate">
                       توضیح مرحله‌به‌مرحله تمام بخش‌های برنامه
                     </p>
                   </div>
@@ -258,8 +266,8 @@ export const MobileNav: React.FC<MobileNavProps> = ({ drawerOpen, setDrawerOpen 
                       }}
                       className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition cursor-pointer ${
                         isActive
-                          ? 'bg-purple-600 text-white border-purple-500 shadow-md shadow-purple-900/30'
-                          : 'bg-slate-800/60 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white'
+                          ? 'bg-[#8B3DFF] text-white border-[#7430D9] shadow-md shadow-purple-900/20'
+                          : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
                       <Icon className="w-5 h-5 mb-1.5" />
