@@ -40,6 +40,7 @@ export const Header: React.FC<HeaderProps> = ({ onMobileMenuToggle }) => {
     openGlobalSearch,
     openQuickAdd,
     openMascotTour,
+    openMascotGuide,
     settings,
     updateSettings,
     pomodoroIsRunning,
@@ -142,13 +143,13 @@ export const Header: React.FC<HeaderProps> = ({ onMobileMenuToggle }) => {
           <Search className="w-5 h-5" />
         </button>
 
-        {/* Mascot Avatar Guide Button: Exactly like screenshots */}
+        {/* Mascot Avatar Guide Button: Opens the live section guide widget */}
         <button
           id="header-mascot-guide-btn"
           type="button"
-          onClick={() => openMascotTour(0)}
+          onClick={openMascotGuide}
           className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full p-0.5 bg-gradient-to-tr from-amber-400 via-orange-400 to-amber-500 border border-orange-400/60 shadow-sm hover:scale-105 active:scale-95 transition cursor-pointer shrink-0"
-          title="راهنمای جامع برنامه (ممد راهنما)"
+          title="راهنمای هوشمند این بخش (ممد راهنما)"
         >
           <div className="w-full h-full rounded-full overflow-hidden bg-white dark:bg-slate-900 flex items-center justify-center">
             <img

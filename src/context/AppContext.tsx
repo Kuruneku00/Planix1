@@ -39,6 +39,9 @@ interface AppContextType {
   setMascotTourOpen: (open: boolean) => void;
   mascotInitialStep: number;
   openMascotTour: (initialStep?: number) => void;
+  mascotGuideOpen: boolean;
+  setMascotGuideOpen: (open: boolean) => void;
+  openMascotGuide: () => void;
   onboardingOpen: boolean;
   setOnboardingOpen: (open: boolean) => void;
   openOnboarding: () => void;
@@ -86,6 +89,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [notificationCenterOpen, setNotificationCenterOpen] = useState(false);
   const [mascotTourOpen, setMascotTourOpen] = useState(false);
   const [mascotInitialStep, setMascotInitialStep] = useState(0);
+  const [mascotGuideOpen, setMascotGuideOpen] = useState(false);
   const [onboardingOpen, setOnboardingOpen] = useState(false);
 
   const openOnboarding = useCallback(() => {
@@ -95,6 +99,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const openMascotTour = useCallback((initialStep: number = 0) => {
     setMascotInitialStep(initialStep);
     setMascotTourOpen(true);
+  }, []);
+
+  const openMascotGuide = useCallback(() => {
+    setMascotGuideOpen(true);
   }, []);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogOptions | null>(null);
@@ -553,6 +561,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setMascotTourOpen,
         mascotInitialStep,
         openMascotTour,
+        mascotGuideOpen,
+        setMascotGuideOpen,
+        openMascotGuide,
         onboardingOpen,
         setOnboardingOpen,
         openOnboarding,

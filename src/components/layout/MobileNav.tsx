@@ -47,7 +47,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ drawerOpen, setDrawerOpen 
     }
   };
 
-  const { activeView, setActiveView, openQuickAdd, settings, updateSettings, openMascotTour } = useApp();
+  const { activeView, setActiveView, openQuickAdd, settings, updateSettings, openMascotTour, openMascotGuide } = useApp();
 
   const toggleTheme = () => {
     updateSettings({ theme: settings.theme === 'dark' ? 'light' : 'dark' });
@@ -220,29 +220,44 @@ export const MobileNav: React.FC<MobileNavProps> = ({ drawerOpen, setDrawerOpen 
                 </div>
               </div>
 
-              {/* Mascot Companion Tour in Mobile Drawer */}
-              <div className="px-4 pt-3 pb-1">
+              {/* Mascot Companions in Mobile Drawer: Practical Guide & Visual Tour */}
+              <div className="px-4 pt-3 pb-1 space-y-2">
+                {/* Practical live guide for current view */}
+                <div
+                  onClick={() => {
+                    handleSetDrawerOpen(false);
+                    openMascotGuide();
+                  }}
+                  className="p-3 rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-500/60 transition flex items-center gap-3 cursor-pointer shadow-sm group active:scale-95"
+                >
+                  <MascotAvatar size="sm" animated={true} />
+                  <div className="flex-1 min-w-0 text-right">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-amber-500 dark:text-amber-300 group-hover:text-amber-400">
+                        راهنمای عملی ممد 🦊
+                      </span>
+                      <span className="px-1.5 py-0.2 rounded-md bg-amber-500/20 text-[9px] text-amber-400 font-bold">
+                        بخش جاری
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5 truncate">
+                      توضیحات و اقدامات کاربردی این بخش در گوشی
+                    </p>
+                  </div>
+                </div>
+
+                {/* Full visual tour button */}
                 <div
                   onClick={() => {
                     handleSetDrawerOpen(false);
                     openMascotTour(0);
                   }}
-                  className="p-3 rounded-2xl bg-purple-50 dark:bg-slate-800/60 hover:bg-purple-100/70 dark:hover:bg-slate-800 border border-purple-200 dark:border-slate-700/70 hover:border-purple-400 transition flex items-center gap-3 cursor-pointer shadow-sm group"
+                  className="p-2.5 rounded-xl bg-purple-50 dark:bg-slate-800/60 hover:bg-purple-100/70 dark:hover:bg-slate-800 border border-purple-200 dark:border-slate-700/70 hover:border-purple-400 transition flex items-center justify-between cursor-pointer active:scale-95"
                 >
-                  <MascotAvatar size="sm" animated={true} />
-                  <div className="flex-1 min-w-0 text-right">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#8B3DFF]">
-                        راهنمای بخش‌ها 🦊
-                      </span>
-                      <span className="px-1.5 py-0.2 rounded-md bg-[#8B3DFF]/15 text-[9px] text-[#8B3DFF] font-bold">
-                        تور
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5 truncate">
-                      توضیح مرحله‌به‌مرحله تمام بخش‌های برنامه
-                    </p>
-                  </div>
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                    راهنمای تصویری کل بخش‌ها
+                  </span>
+                  <span className="text-[10px] text-[#8B3DFF] font-bold">مشاهده تور ←</span>
                 </div>
               </div>
 
