@@ -17,6 +17,7 @@ import {
   Flame,
   FileText,
   Bell,
+  Timer,
   Plus,
   Minus,
   Hash,
@@ -25,10 +26,23 @@ import {
 } from 'lucide-react';
 
 export const QuickAddModal: React.FC = () => {
-  const { quickAddOpen, setQuickAddOpen, quickAddDefaultTab, quickAddInitialData, showToast, refreshDb, settings } = useApp();
+  const {
+    quickAddOpen,
+    setQuickAddOpen,
+    quickAddDefaultTab,
+    quickAddInitialData,
+    showToast,
+    refreshDb,
+    settings,
+    recordPomodoroSession,
+  } = useApp();
   const [activeTab, setActiveTab] = useState(quickAddDefaultTab || 'task');
 
   // Form states
+  // Pomodoro
+  const [pomoMinutes, setPomoMinutes] = useState(settings.pomodoroFocusMinutes || 25);
+  const [pomoTaskId, setPomoTaskId] = useState('');
+  const [pomoNote, setPomoNote] = useState('');
   // Task
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDesc, setTaskDesc] = useState('');
@@ -357,9 +371,23 @@ export const QuickAddModal: React.FC = () => {
     setQuickAddOpen(false);
   };
 
+  const handleCreatePomodoro = (e: React.FormEvent) => {
+    e.preventDefault();
+    const mins = Number(pomoMinutes);
+    if (isNaN(mins) || mins < 1 || mins > 720) {
+      showToast('لطفاً مدت زمان معتبری وارد کنید (۱ تا ۷۲۰ دقیقه)', 'error');
+      return;
+    }
+    const allTasks = db.getTasks();
+    const task = allTasks.find((t) => t.id === pomoTaskId);
+    recordPomodoroSession(mins, task?.title || pomoNote, pomoTaskId);
+    setQuickAddOpen(false);
+  };
+
   const tabs = [
     { id: 'task', label: 'وظیفه', icon: CheckSquare },
     { id: 'event', label: 'رویداد', icon: CalendarIcon },
+    { id: 'pomodoro', label: 'تمرکز', icon: Timer },
     { id: 'project', label: 'پروژه', icon: FolderKanban },
     { id: 'goal', label: 'هدف', icon: Target },
     { id: 'habit', label: 'عادت', icon: Flame },
@@ -381,7 +409,7 @@ export const QuickAddModal: React.FC = () => {
     >
       <div className="space-y-5" dir="rtl">
         {/* Equal-sized Navigation Tabs on Desktop */}
-        <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5 p-1 rounded-2xl bg-slate-800/40 border border-slate-800">
+        <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 p-1 rounded-2xl bg-slate-800/40 border border-slate-800">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -612,6 +640,103 @@ export const QuickAddModal: React.FC = () => {
               >
                 <CalendarIcon className="w-4 h-4" />
                 <span>افزودن به تقویم</span>
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* Tab: Pomodoro Focus Session */}
+        {activeTab === 'pomodoro' && (
+          <form onSubmit={handleCreatePomodoro} className="space-y-4">
+            <div>
+              <label className={labelClass}>مدت زمان تمرکز (دقیقه) *</label>
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <button
+                  type="button"
+                  onClick={() => setPomoMinutes((prev) => Math.max(1, prev - 5))}
+                  className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-700 transition cursor-pointer"
+                >
+                  -۵
+                </button>
+                <input
+                  type="number"
+                  required
+                  min={1}
+                  max={720}
+                  value={pomoMinutes}
+                  onChange={(e) => {
+                    const v = parseInt(e.target.value, 10);
+                    setPomoMinutes(isNaN(v) ? 0 : v);
+                  }}
+                  className="w-24 text-center text-xl font-black text-slate-100 bg-slate-800 border border-purple-500/60 rounded-xl py-2 font-mono focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setPomoMinutes((prev) => Math.min(720, prev + 5))}
+                  className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-700 transition cursor-pointer"
+                >
+                  +۵
+                </button>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {[15, 25, 45, 60, 90].map((mins) => (
+                    <button
+                      key={mins}
+                      type="button"
+                      onClick={() => setPomoMinutes(mins)}
+                      className={`px-2.5 py-1.5 rounded-lg text-xs font-bold border transition cursor-pointer ${
+                        pomoMinutes === mins
+                          ? 'bg-purple-600 border-purple-500 text-white'
+                          : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      {settings.persianDigits ? toPersianDigits(mins) : mins} دقیقه
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className={labelClass}>اتصال به وظیفه مشخص (اختیاری)</label>
+              <select
+                value={pomoTaskId}
+                onChange={(e) => setPomoTaskId(e.target.value)}
+                className={fieldInputClass}
+              >
+                <option value="">تمرکز عمومی (بدون اتصال به وظیفه)</option>
+                {db.getTasks().map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className={labelClass}>یادداشت یا موضوع تمرکز (اختیاری)</label>
+              <input
+                type="text"
+                value={pomoNote}
+                onChange={(e) => setPomoNote(e.target.value)}
+                placeholder="مثلاً: مطالعه کتاب، پیاده‌سازی کامپوننت ..."
+                className={fieldInputClass}
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => setQuickAddOpen(false)}
+                className="h-11 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium border border-slate-700 transition cursor-pointer"
+              >
+                انصراف
+              </button>
+              <button
+                type="submit"
+                className="h-11 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs sm:text-sm transition shadow-md shadow-emerald-950/40 cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <Timer className="w-4 h-4" />
+                <span>ثبت سشن تمرکز</span>
               </button>
             </div>
           </form>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useApp } from '../../context/AppContext';
 import { ActiveView } from '../../types';
 import {
   Sparkles,
@@ -34,6 +35,8 @@ export const SectionDiagramMockup: React.FC<SectionDiagramMockupProps> = ({
   onSelectCallout,
   isLight = false,
 }) => {
+  const { settings } = useApp();
+
   return (
     <div
       className={`relative w-full rounded-2xl p-3 sm:p-3.5 select-none mx-auto transition-colors ${
@@ -120,7 +123,9 @@ export const SectionDiagramMockup: React.FC<SectionDiagramMockupProps> = ({
           {/* User greeting */}
           <div className="text-right">
             <h4 className={`text-sm sm:text-base font-black ${isLight ? 'text-slate-900' : 'text-white'}`}>
-              سلام کاربر گرامی، روزت بخیر!
+              {settings.userName && settings.userName.trim() && settings.userName !== 'کاربر گرامی'
+                ? `سلام ${settings.userName}، روزت بخیر!`
+                : 'سلام کاربر گرامی، روزت بخیر!'}
             </h4>
           </div>
 

@@ -44,11 +44,25 @@ export const DashboardView: React.FC = () => {
   }, [allEvents, todayIso]);
 
   const todayPomodoros = useMemo(() => {
-    return allPomodoro.filter((p) => p.completedAt.startsWith(todayIso) && p.mode === 'focus');
+    return allPomodoro.filter((p) => {
+      if (!p.completedAt) return false;
+      const datePart = p.completedAt.split('T')[0];
+      const matchesDate =
+        datePart === todayIso ||
+        p.completedAt.startsWith(todayIso) ||
+        (() => {
+          try {
+            return toGregorianIsoDate(new Date(p.completedAt)) === todayIso;
+          } catch {
+            return false;
+          }
+        })();
+      return matchesDate && (p.mode === 'focus' || !p.mode);
+    });
   }, [allPomodoro, todayIso]);
 
   const todayFocusMinutes = useMemo(() => {
-    return todayPomodoros.reduce((acc, p) => acc + p.durationMinutes, 0);
+    return todayPomodoros.reduce((acc, p) => acc + (Number(p.durationMinutes) || 0), 0);
   }, [todayPomodoros]);
 
   const todayHabitsDoneCount = useMemo(() => {
@@ -58,9 +72,11 @@ export const DashboardView: React.FC = () => {
   const focusHours = Math.floor(todayFocusMinutes / 60);
   const focusRemMinutes = todayFocusMinutes % 60;
   const focusTimeDisplay =
-    focusHours > 0
-      ? `${focusHours}:${String(focusRemMinutes).padStart(2, '0')}`
-      : `${focusRemMinutes} دقیقه`;
+    todayFocusMinutes === 0
+      ? '0 دقیقه'
+      : focusHours > 0
+      ? `${focusHours} ساعت ${focusRemMinutes > 0 ? `و ${focusRemMinutes} د` : ''}`
+      : `${todayFocusMinutes} دقیقه`;
 
   return (
     <div id="dashboard-view" className="space-y-4 sm:space-y-5 max-w-7xl mx-auto pb-24 sm:pb-8" dir="rtl">
@@ -79,10 +95,12 @@ export const DashboardView: React.FC = () => {
           </div>
         </div>
 
-        {/* Greeting Headline: exactly like screenshot: "سلام، به پلنر خوش آمدید!" */}
+        {/* Greeting Headline: Display user's name */}
         <div className="text-right mb-4">
           <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
-            سلام، به پلنر خوش آمدید!
+            {settings.userName && settings.userName.trim() && settings.userName !== 'کاربر گرامی'
+              ? `سلام ${settings.userName}، روزت بخیر!`
+              : 'سلام کاربر گرامی، روزت بخیر!'}
           </h2>
         </div>
 

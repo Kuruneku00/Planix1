@@ -25,7 +25,10 @@ export const ReportsView: React.FC = () => {
 
   const completedTasks = useMemo(() => allTasks.filter((t) => t.status === 'completed'), [allTasks]);
   const totalFocusMinutes = useMemo(
-    () => allPomodoros.filter((p) => p.mode === 'focus').reduce((acc, p) => acc + p.durationMinutes, 0),
+    () =>
+      allPomodoros
+        .filter((p) => p.mode === 'focus' || !p.mode)
+        .reduce((acc, p) => acc + (Number(p.durationMinutes) || 0), 0),
     [allPomodoros]
   );
 

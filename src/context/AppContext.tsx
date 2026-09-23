@@ -5,6 +5,7 @@ import { soundEffects } from '../utils/audio';
 import { systemPermissions } from '../services/systemPermissions';
 import { nativeBridge } from '../services/nativeBridge';
 import { reminderScheduler } from '../services/reminderScheduler';
+import { toGregorianIsoDate } from '../utils/jalali';
 
 export interface Toast {
   id: string;
@@ -70,6 +71,8 @@ interface AppContextType {
   setPomodoroDuration: (minutes: number) => void;
   skipPomodoro: () => void;
   unlockPomodoroFocus: () => void;
+  recordPomodoroSession: (durationMinutes: number, taskTitle?: string, taskId?: string) => void;
+  finishAndLogPomodoro: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -140,12 +143,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [settings.hasSeenMascotTour]);
 
-  const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' | 'warning' = 'success') => {
-    const id = `toast_${Date.now()}_${Math.random().toString(36).substring(2, 5)}`;
-    setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4000);
+  // In-app toasts are completely suppressed per user requirement:
+  // "هیچ نوتیفی نمیخوام داخل خود برنامه بیاد نوتیف های لازم رو همون از طریق نوتیف گوشی ارسال کنه وو چیزایی کهمهم نیستن ام نیاد"
+  const showToast = useCallback((_message: string, _type: 'success' | 'error' | 'info' | 'warning' = 'success') => {
+    // In-app toast banners disabled. All necessary alerts are sent to the phone's native notification system only.
   }, []);
 
   const removeToast = useCallback((id: string) => {
@@ -332,6 +333,87 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     nativeBridge.stopPomodoroFocus();
   }, []);
 
+  const recordPomodoroSession = useCallback(
+    (durationMinutes: number, taskTitle?: string, taskId?: string) => {
+      const nowDate = new Date();
+      const duration = Math.max(1, Math.round(durationMinutes));
+
+      db.savePomodoroSession({
+        id: `pomo_${Date.now()}`,
+        mode: 'focus',
+        durationMinutes: duration,
+        completedAt: nowDate.toISOString(),
+        taskId: taskId || undefined,
+        taskTitle: taskTitle || undefined,
+      });
+
+      // Also record time entry for productivity analytics
+      const start = new Date(nowDate.getTime() - duration * 60 * 1000);
+      const startHH = String(start.getHours()).padStart(2, '0');
+      const startMM = String(start.getMinutes()).padStart(2, '0');
+      const endHH = String(nowDate.getHours()).padStart(2, '0');
+      const endMM = String(nowDate.getMinutes()).padStart(2, '0');
+
+      db.saveTimeEntry({
+        id: `time_${Date.now()}`,
+        title: taskTitle || 'جلسه تمرکز عمیق',
+        category: 'work',
+        date: toGregorianIsoDate(nowDate),
+        startTime: `${startHH}:${startMM}`,
+        endTime: `${endHH}:${endMM}`,
+        durationMinutes: duration,
+        linkedTaskId: taskId || undefined,
+        createdAt: nowDate.toISOString(),
+      });
+
+      db.saveNotification({
+        id: `notif_${Date.now()}`,
+        title: 'جلسه تمرکز پایان یافت',
+        message: `آفرین! یک جلسه تمرکز (${duration} دقیقه) با موفقیت در سوابق ذخیره شد.`,
+        type: 'system',
+        read: false,
+        targetView: 'pomodoro',
+        timestamp: nowDate.toISOString(),
+      });
+
+      // CRITICAL: trigger react state refresh so dashboard & pomodoro view re-render immediately
+      setRefreshTrigger((prev) => prev + 1);
+
+      showToast(`جلسه تمرکز (${duration} دقیقه) با موفقیت ثبت شد ✨`, 'success');
+
+      if (settings.soundEnabled || settings.soundEffectsEnabled) {
+        soundEffects.playSuccessNotification();
+      }
+    },
+    [settings.soundEnabled, settings.soundEffectsEnabled, showToast]
+  );
+
+  const finishAndLogPomodoro = useCallback(() => {
+    targetEndTimeRef.current = null;
+    systemPermissions.releaseWakeLock();
+    nativeBridge.cancelAlarm('pomodoro_active_session');
+    nativeBridge.stopPomodoroFocus();
+
+    const plannedMinutes = settings.pomodoroFocusMinutes || 25;
+    const plannedSeconds = plannedMinutes * 60;
+    const elapsedSeconds = Math.max(0, plannedSeconds - pomodoroSecondsLeft);
+    // If elapsed is at least 30 seconds, record the elapsed minutes; otherwise record planned duration
+    const minutesToRecord = elapsedSeconds >= 30 ? Math.ceil(elapsedSeconds / 60) : plannedMinutes;
+
+    recordPomodoroSession(minutesToRecord, pomodoroActiveTaskTitle, pomodoroActiveTaskId);
+
+    setPomodoroIsRunning(false);
+    setPomodoroStrictLock(false);
+    setPomodoroMode('focus');
+    setPomodoroSecondsLeft(plannedMinutes * 60);
+  }, [
+    pomodoroSecondsLeft,
+    pomodoroActiveTaskTitle,
+    pomodoroActiveTaskId,
+    settings.pomodoroFocusMinutes,
+    recordPomodoroSession,
+  ]);
+
   // Global Pomodoro countdown ticker with mobile background time synchronization
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -355,7 +437,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           nativeBridge.stopPomodoroFocus();
           nativeBridge.cancelAlarm('pomodoro_active_session');
 
-          // 1. Trigger True Audible Alarm (loops until user stops or snoozes, rings through native USAGE_ALARM even in Silent mode)
+          // 1. Trigger True Audible Alarm
           reminderScheduler.triggerAlarm({
             id: `pomodoro_completed_${Date.now()}`,
             title: 'پایان زمان تمرکز پومودورو 🍅',
@@ -367,49 +449,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             targetView: 'pomodoro',
           });
 
-          // Log session in DB
+          // Log session in DB & update UI immediately
           const duration = settings.pomodoroFocusMinutes || 25;
-
-          db.savePomodoroSession({
-            id: `pomo_${Date.now()}`,
-            mode: 'focus',
-            durationMinutes: duration,
-            completedAt: new Date().toISOString(),
-            taskId: pomodoroActiveTaskId,
-            taskTitle: pomodoroActiveTaskTitle,
-          });
-
-          // Also record time entry for productivity analytics
-          const nowDate = new Date();
-          const start = new Date(nowDate.getTime() - duration * 60 * 1000);
-          const startHH = String(start.getHours()).padStart(2, '0');
-          const startMM = String(start.getMinutes()).padStart(2, '0');
-          const endHH = String(nowDate.getHours()).padStart(2, '0');
-          const endMM = String(nowDate.getMinutes()).padStart(2, '0');
-
-          db.saveTimeEntry({
-            id: `time_${Date.now()}`,
-            title: pomodoroActiveTaskTitle || 'جلسه تمرکز عمیق',
-            category: 'work',
-            date: nowDate.toISOString().split('T')[0],
-            startTime: `${startHH}:${startMM}`,
-            endTime: `${endHH}:${endMM}`,
-            durationMinutes: duration,
-            linkedTaskId: pomodoroActiveTaskId,
-            createdAt: nowDate.toISOString(),
-          });
-
-          db.saveNotification({
-            id: `notif_${Date.now()}`,
-            title: 'جلسه تمرکز پایان یافت',
-            message: 'آفرین! یک جلسه تمرکز با موفقیت تکمیل شد.',
-            type: 'system',
-            read: false,
-            targetView: 'pomodoro',
-            timestamp: new Date().toISOString(),
-          });
-
-          showToast('تبریک! جلسه تمرکز با موفقیت به پایان رسید.', 'success');
+          recordPomodoroSession(duration, pomodoroActiveTaskTitle, pomodoroActiveTaskId);
 
           setPomodoroMode('focus');
           setPomodoroSecondsLeft((settings.pomodoroFocusMinutes || 25) * 60);
@@ -424,8 +466,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     pomodoroSecondsLeft,
     pomodoroActiveTaskId,
     pomodoroActiveTaskTitle,
-    settings,
-    showToast,
+    settings.pomodoroFocusMinutes,
+    recordPomodoroSession,
   ]);
 
   // Synchronize Pomodoro timer when mobile screen turns on / tab becomes visible
@@ -542,6 +584,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setPomodoroDuration,
         skipPomodoro,
         unlockPomodoroFocus,
+        recordPomodoroSession,
+        finishAndLogPomodoro,
       }}
     >
       {children}

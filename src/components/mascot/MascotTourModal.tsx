@@ -12,7 +12,15 @@ import {
   Lightbulb,
 } from 'lucide-react';
 
-export const MascotTourModal: React.FC = () => {
+interface MascotTourModalProps {
+  isOnboardingMode?: boolean;
+  onComplete?: () => void;
+}
+
+export const MascotTourModal: React.FC<MascotTourModalProps> = ({
+  isOnboardingMode = false,
+  onComplete,
+}) => {
   const {
     mascotTourOpen,
     setMascotTourOpen,
@@ -27,7 +35,7 @@ export const MascotTourModal: React.FC = () => {
 
   // Sync initial step when tour opens
   useEffect(() => {
-    if (mascotTourOpen) {
+    if (mascotTourOpen || isOnboardingMode) {
       const initIdx =
         typeof mascotInitialStep === 'number' &&
         mascotInitialStep >= 0 &&
@@ -36,7 +44,7 @@ export const MascotTourModal: React.FC = () => {
           : 0;
       setCurrentStepIndex(initIdx);
     }
-  }, [mascotTourOpen, mascotInitialStep]);
+  }, [mascotTourOpen, mascotInitialStep, isOnboardingMode]);
 
   useEffect(() => {
     if (scrollContainerRef.current) {
@@ -44,7 +52,7 @@ export const MascotTourModal: React.FC = () => {
     }
   }, [currentStepIndex]);
 
-  if (!mascotTourOpen) return null;
+  if (!isOnboardingMode && !mascotTourOpen) return null;
 
   const currentStep = VISUAL_TOUR_SECTIONS[currentStepIndex] || VISUAL_TOUR_SECTIONS[0];
   const totalSteps = VISUAL_TOUR_SECTIONS.length;
@@ -78,17 +86,15 @@ export const MascotTourModal: React.FC = () => {
     if (settings.soundEnabled || settings.soundEffectsEnabled) {
       soundEffects.playSuccessNotification();
     }
-    const wasFirstLaunch = settings.isFirstLaunch || !settings.hasSeenMascotTour;
     updateSettings({ 
       hasSeenMascotTour: true, 
-      hasCompletedOnboarding: true,
-      isFirstLaunch: false 
     });
     setMascotTourOpen(false);
 
-    // Only show "خوش آمدید" welcome toast on very first launch/tour finish
-    if (wasFirstLaunch) {
-      showToast('به برنامه Planix خوش آمدید 🦊', 'success');
+    if (onComplete) {
+      onComplete();
+    } else {
+      showToast('راهنمای بخش‌ها به پایان رسید 🦊', 'success');
     }
   };
 

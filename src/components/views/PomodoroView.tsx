@@ -24,6 +24,8 @@ import {
   Minus,
   Edit3,
   Check,
+  CheckCircle2,
+  Trash2,
   X,
   Clock,
 } from 'lucide-react';
@@ -39,16 +41,22 @@ export const PomodoroView: React.FC = () => {
     pausePomodoro,
     resetPomodoro,
     setPomodoroDuration,
+    recordPomodoroSession,
+    finishAndLogPomodoro,
     settings,
     updateSettings,
     refreshTrigger,
+    refreshDb,
     showToast,
   } = useApp();
 
   const [selectedTaskId, setSelectedTaskId] = useState<string>('');
   const [showLockPrompt, setShowLockPrompt] = useState<boolean>(false);
   const [showCustomModal, setShowCustomModal] = useState<boolean>(false);
+  const [showManualLogModal, setShowManualLogModal] = useState<boolean>(false);
   const [customMinutes, setCustomMinutes] = useState<number>(settings.pomodoroFocusMinutes || 25);
+  const [manualMinutes, setManualMinutes] = useState<number>(settings.pomodoroFocusMinutes || 25);
+  const [manualTaskId, setManualTaskId] = useState<string>('');
 
   const handleInitiateStart = () => {
     if (pomodoroIsRunning) {
@@ -80,6 +88,23 @@ export const PomodoroView: React.FC = () => {
     showToast(`زمان تمرکز روی ${settings.persianDigits ? toPersianDigits(val) : val} دقیقه تنظیم شد`, 'success');
   };
 
+  const handleSaveManualSession = () => {
+    const mins = Number(manualMinutes);
+    if (isNaN(mins) || mins < 1 || mins > 720) {
+      showToast('لطفاً مدت زمان معتبری وارد کنید (۱ تا ۷۲۰ دقیقه)', 'error');
+      return;
+    }
+    const task = allTasks.find((t) => t.id === manualTaskId);
+    recordPomodoroSession(mins, task?.title, manualTaskId);
+    setShowManualLogModal(false);
+  };
+
+  const handleDeleteSession = (sessionId: string) => {
+    db.deletePomodoroSession(sessionId);
+    refreshDb();
+    showToast('سشن تمرکز حذف شد', 'info');
+  };
+
   const allTasks = useMemo(() => {
     return db.getTasks().filter((t) => t.status !== 'completed');
   }, [refreshTrigger]);
@@ -90,8 +115,8 @@ export const PomodoroView: React.FC = () => {
 
   const totalFocusMinutes = useMemo(() => {
     return allSessions
-      .filter((s) => s.mode === 'focus')
-      .reduce((acc, s) => acc + s.durationMinutes, 0);
+      .filter((s) => s.mode === 'focus' || !s.mode)
+      .reduce((acc, s) => acc + (Number(s.durationMinutes) || 0), 0);
   }, [allSessions]);
 
   const minutes = Math.floor(pomodoroSecondsLeft / 60);
@@ -249,7 +274,7 @@ export const PomodoroView: React.FC = () => {
         </div>
 
         {/* Control Buttons */}
-        <div className="flex items-center gap-4 mt-8 z-10">
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-8 z-10">
           {/* Reset button */}
           <button
             type="button"
@@ -283,6 +308,19 @@ export const PomodoroView: React.FC = () => {
             )}
           </button>
 
+          {/* Direct Finish & Log Time button */}
+          {(pomodoroIsRunning || pomodoroSecondsLeft < totalSeconds) && (
+            <button
+              type="button"
+              onClick={finishAndLogPomodoro}
+              className="py-4 px-5 sm:px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-emerald-950/40 transition cursor-pointer active:scale-95"
+              title="پایان جلسه و ثبت زمان در داشبورد و گزارش‌ها"
+            >
+              <CheckCircle2 className="w-5 h-5" />
+              <span>اتمام و ثبت زمان</span>
+            </button>
+          )}
+
           {/* Sound Toggle Button */}
           <button
             type="button"
@@ -297,6 +335,21 @@ export const PomodoroView: React.FC = () => {
             title={settings.soundEffectsEnabled ? 'صدا روشن' : 'صدا خاموش'}
           >
             {settings.soundEffectsEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+          </button>
+        </div>
+
+        {/* Secondary helper action: Quick manual session logging */}
+        <div className="flex items-center gap-3 mt-4 z-10">
+          <button
+            type="button"
+            onClick={() => {
+              setManualMinutes(settings.pomodoroFocusMinutes || 25);
+              setShowManualLogModal(true);
+            }}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-950/40 hover:bg-purple-900/60 border border-purple-800/40 text-purple-300 hover:text-purple-200 text-xs font-bold transition cursor-pointer active:scale-95"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>ثبت دستی سشن تمرکز جدید</span>
           </button>
         </div>
 
@@ -505,6 +558,135 @@ export const PomodoroView: React.FC = () => {
         )}
       </AnimatePresence>
 
+      {/* Manual Focus Session Entry Modal */}
+      <AnimatePresence>
+        {showManualLogModal && (
+          <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 safe-overlay" dir="rtl">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5"
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-10 h-10 rounded-xl bg-purple-950/80 border border-purple-800/60 text-purple-400 flex items-center justify-center">
+                    <CheckCircle2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-100">ثبت سشن تمرکز جدید</h3>
+                    <p className="text-[11px] text-slate-400 mt-0.5">ثبت مستقیم دقایق تمرکز در داشبورد و سوابق روزانه</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowManualLogModal(false)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 cursor-pointer transition"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Minute selection */}
+              <div className="p-4 rounded-2xl bg-slate-800/60 border border-slate-700/60 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-slate-300">مدت زمان تمرکز (دقیقه):</label>
+                  <span className="text-lg font-black text-purple-400 font-mono">
+                    {settings.persianDigits ? toPersianDigits(manualMinutes) : manualMinutes} د
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setManualMinutes((prev) => Math.max(1, prev - 5))}
+                    className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-700 transition cursor-pointer"
+                  >
+                    -۵
+                  </button>
+                  <input
+                    type="number"
+                    min={1}
+                    max={720}
+                    value={manualMinutes}
+                    onChange={(e) => {
+                      const v = parseInt(e.target.value, 10);
+                      setManualMinutes(isNaN(v) ? 0 : v);
+                    }}
+                    className="w-28 text-center text-2xl font-black text-slate-100 bg-slate-900 border border-purple-500/60 rounded-xl py-1.5 font-mono focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setManualMinutes((prev) => Math.min(720, prev + 5))}
+                    className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-700 transition cursor-pointer"
+                  >
+                    +۵
+                  </button>
+                </div>
+
+                {/* Quick Presets */}
+                <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
+                  {[15, 25, 30, 45, 60, 90, 120].map((mins) => (
+                    <button
+                      key={mins}
+                      type="button"
+                      onClick={() => setManualMinutes(mins)}
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition cursor-pointer ${
+                        manualMinutes === mins
+                          ? 'bg-purple-600 border-purple-500 text-white'
+                          : 'bg-slate-800/80 border-slate-700/60 text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      {settings.persianDigits ? toPersianDigits(mins) : mins}د
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Task Linking */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
+                  <Target className="w-3.5 h-3.5 text-purple-400" />
+                  <span>اتصال به وظیفه مشخص (اختیاری):</span>
+                </label>
+                <select
+                  value={manualTaskId}
+                  onChange={(e) => setManualTaskId(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/90 border border-slate-700 text-slate-200 text-xs focus:outline-none focus:border-purple-500 transition"
+                >
+                  <option value="">تمرکز عمومی (بدون اتصال به وظیفه)</option>
+                  {allTasks.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleSaveManualSession}
+                  className="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/50 cursor-pointer active:scale-95 transition"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>ثبت و ذخیره جلسه</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowManualLogModal(false)}
+                  className="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-700 cursor-pointer active:scale-95 transition"
+                >
+                  انصراف
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* History & Statistics */}
       <motion.div
         initial={{ opacity: 0, y: 15 }}
@@ -524,16 +706,16 @@ export const PomodoroView: React.FC = () => {
 
         {allSessions.length === 0 ? (
           <p className="text-xs text-slate-500 text-center py-6">
-            هنوز سشن تمرکزی تکمیل نشده است. پس از اتمام تایمر، گزارش آن در اینجا ثبت می‌شود.
+            هنوز سشن تمرکزی تکمیل نشده است. پس از اتمام تایمر یا ثبت دستی، گزارش آن در اینجا ثبت می‌شود.
           </p>
         ) : (
           <div className="space-y-2 max-h-56 overflow-y-auto">
-            {allSessions.slice(0, 10).map((s) => (
+            {allSessions.slice(0, 15).map((s) => (
               <motion.div
                 key={s.id}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/40 flex items-center justify-between text-xs hover:bg-slate-800/80 transition"
+                className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/40 flex items-center justify-between text-xs hover:bg-slate-800/80 transition group"
               >
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-purple-400" />
@@ -542,9 +724,19 @@ export const PomodoroView: React.FC = () => {
                     {s.taskTitle ? ` - ${s.taskTitle}` : ''}
                   </span>
                 </div>
-                <span className="text-[11px] text-slate-400 font-mono">
-                  {formatToJalali(s.completedAt, 'short', settings.persianDigits)}
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] text-slate-400 font-mono">
+                    {formatToJalali(s.completedAt, 'short', settings.persianDigits)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteSession(s.id)}
+                    className="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-950/40 transition cursor-pointer"
+                    title="حذف این سشن"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </motion.div>
             ))}
           </div>

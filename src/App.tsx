@@ -167,7 +167,7 @@ const MainLayout: React.FC = () => {
 };
 
 const AppContent: React.FC = () => {
-  const { settings, openMascotTour } = useApp();
+  const { settings, updateSettings } = useApp();
   const [isSplashDone, setIsSplashDone] = React.useState<boolean>(false);
 
   // Initialize central Viewport & Safe Area sync across all lifecycle states
@@ -188,15 +188,13 @@ const AppContent: React.FC = () => {
     );
   }
 
-  // 2. Authentication Gate: Login Screen must precede Dashboard
+  // 2. Authentication Gate: Login Screen must precede Explanations
   if (!settings.isLoggedIn) {
     return (
       <>
         <LoginScreen
           onComplete={() => {
-            setTimeout(() => {
-              openMascotTour(0);
-            }, 250);
+            // Login finished -> automatically proceeds to Step 3: Explanations
           }}
         />
         <ToastContainer />
@@ -204,17 +202,40 @@ const AppContent: React.FC = () => {
     );
   }
 
-  // 3. Permissions Setup Gate: Clean, explicit permission request
-  if (!settings.hasCompletedPermissionSetup) {
+  // 3. Explanations Gate: Visual tour & feature introduction
+  if (!settings.hasSeenMascotTour) {
     return (
       <>
-        <PermissionsScreen onComplete={() => {}} />
+        <MascotTourModal
+          isOnboardingMode={true}
+          onComplete={() => {
+            updateSettings({ hasSeenMascotTour: true });
+          }}
+        />
         <ToastContainer />
       </>
     );
   }
 
-  // 4. Complete Access: Enter Main Planix Application
+  // 4. Permissions Setup Gate: Request clock, exact alarm, and notification permissions
+  if (!settings.hasCompletedPermissionSetup) {
+    return (
+      <>
+        <PermissionsScreen
+          onComplete={() => {
+            updateSettings({
+              hasCompletedPermissionSetup: true,
+              hasCompletedOnboarding: true,
+              isFirstLaunch: false,
+            });
+          }}
+        />
+        <ToastContainer />
+      </>
+    );
+  }
+
+  // 5. Complete Access: Enter Main Planix Application
   return <MainLayout />;
 };
 

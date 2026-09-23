@@ -38,7 +38,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onComplete }) => {
       isLoggedIn: true,
       userName: finalName,
       theme: selectedTheme,
-      hasCompletedPermissionSetup: true,
+      hasCompletedPermissionSetup: false,
       hasSeenMascotTour: false,
     });
 
@@ -58,7 +58,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onComplete }) => {
       isLoggedIn: true,
       userName: 'کاربر گرامی',
       theme: selectedTheme,
-      hasCompletedPermissionSetup: true,
+      hasCompletedPermissionSetup: false,
       hasSeenMascotTour: false,
     });
 

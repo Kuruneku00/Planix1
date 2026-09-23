@@ -56,11 +56,11 @@ const DEFAULT_SETTINGS: UserSettings = {
   notificationsEnabled: true,
   syncEnabled: false,
   userName: '',
-  isLoggedIn: true,
-  hasCompletedOnboarding: true,
-  hasCompletedPermissionSetup: true,
-  isFirstLaunch: false,
-  hasSeenMascotTour: true,
+  isLoggedIn: false,
+  hasCompletedOnboarding: false,
+  hasCompletedPermissionSetup: false,
+  isFirstLaunch: true,
+  hasSeenMascotTour: false,
 };
 
 class DatabaseService {
@@ -661,6 +661,11 @@ class DatabaseService {
   savePomodoroSession(session: PomodoroSession): void {
     const sessions = this.getPomodoroSessions();
     sessions.unshift(session);
+    this.set(STORAGE_KEYS.POMODORO_SESSIONS, sessions);
+  }
+
+  deletePomodoroSession(id: string): void {
+    const sessions = this.getPomodoroSessions().filter((s) => s.id !== id);
     this.set(STORAGE_KEYS.POMODORO_SESSIONS, sessions);
   }
 
