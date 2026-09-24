@@ -161,16 +161,21 @@ export const PersistentMascotWidget: React.FC = () => {
         />
       )}
 
-      {/* Floating Circular Widget & Popover Card in right corner - completely localized */}
+      {/* Floating Circular Widget & Popover Card: strictly above mobile bottom nav on phones, and bottom corner on desktop */}
       <aside
         id="persistent-mascot-widget"
         aria-label={`دستیار هوشمند ${MASCOT_INFO.shortName}`}
-        className="fixed z-40 bottom-20 right-4 sm:bottom-6 sm:right-6 pointer-events-auto select-none"
+        className={`fixed pointer-events-auto select-none transition-all duration-200 right-3.5 sm:right-4 lg:right-auto lg:left-6 ${
+          expanded ? 'z-50' : 'z-35'
+        }`}
+        style={{
+          bottom: 'calc(4rem + var(--safe-bottom, 0px) + 0.875rem)',
+        }}
         dir="rtl"
       >
-        {/* The Card (کادر بازشو دقیقاً بالای آیکون دایره‌ای در سمت راست) */}
+        {/* The Card (کادر بازشو دقیقاً بالای آیکون دایره‌ای) */}
         {expanded && (
-          <div className="absolute bottom-14 right-0 w-[calc(100vw-2rem)] max-w-sm sm:w-85 rounded-2xl bg-slate-900/98 dark:bg-[#0c1020]/98 border-2 border-amber-500/60 shadow-2xl shadow-black/80 p-3.5 sm:p-4 text-slate-100 backdrop-blur-xl animate-in zoom-in-95 fade-in slide-in-from-bottom-3 duration-200 mb-1 z-50">
+          <div className="absolute bottom-14 right-0 lg:right-auto lg:left-0 w-[calc(100vw-2rem)] max-w-sm sm:w-85 rounded-2xl bg-slate-900/98 dark:bg-[#0c1020]/98 border-2 border-amber-500/60 shadow-2xl shadow-black/80 p-3.5 sm:p-4 text-slate-100 backdrop-blur-xl animate-in zoom-in-95 fade-in slide-in-from-bottom-3 duration-200 mb-1 z-50">
             {/* Header */}
             <div className="flex items-center justify-between pb-2 border-b border-slate-800">
               <div className="flex items-center gap-2">
@@ -253,13 +258,13 @@ export const PersistentMascotWidget: React.FC = () => {
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
-          className={`group relative flex items-center justify-center w-12 h-12 sm:w-auto sm:h-auto sm:p-1.5 sm:pr-3 sm:pl-3.5 rounded-full bg-slate-900/95 hover:bg-slate-800 border-2 transition-all transform active:scale-90 cursor-pointer backdrop-blur-md ${
+          className={`group relative flex items-center justify-center w-12 h-12 lg:w-auto lg:h-auto lg:p-1.5 lg:pr-3 lg:pl-3.5 rounded-full bg-slate-900/95 hover:bg-slate-800 border-2 transition-all transform active:scale-90 cursor-pointer backdrop-blur-md ${
             expanded ? 'border-amber-400 ring-2 ring-amber-400/30' : 'border-amber-500/70 shadow-xl shadow-amber-950/50'
           }`}
           title={`راهنمای عملی ${MASCOT_INFO.shortName} برای این بخش`}
         >
           <MascotAvatar size="xs" animated={true} />
-          <div className="text-right hidden sm:block mr-2">
+          <div className="text-right hidden lg:block mr-2">
             <span className="text-[11px] font-bold text-amber-300 group-hover:text-amber-200 block leading-tight">
               {MASCOT_INFO.shortName}
             </span>

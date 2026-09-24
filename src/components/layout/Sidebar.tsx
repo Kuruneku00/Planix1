@@ -301,6 +301,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, setCollapse
             </button>
           </div>
         )}
+
+        {!isCollapsed && (
+          <div className="mt-2 text-center">
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">
+              ساخته شده در <span className="text-[#8B3DFF] font-bold">رومی لند</span> توسط <span className="text-[#8B3DFF] font-bold">یگانه بابایی</span>
+            </p>
+          </div>
+        )}
       </div>
     </aside>
   );

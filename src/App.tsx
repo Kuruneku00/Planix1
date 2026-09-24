@@ -138,7 +138,7 @@ const MainLayout: React.FC = () => {
         {/* Scrollable View Container - cleanly scrollable between Header and BottomNav */}
         <main
           className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-3 sm:p-6 lg:p-8"
-          style={{ paddingBottom: 'calc(5rem + var(--safe-bottom))' }}
+          style={{ paddingBottom: 'calc(7.5rem + var(--safe-bottom, 0px))' }}
         >
           {renderCurrentView()}
         </main>

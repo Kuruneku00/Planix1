@@ -635,3 +635,14 @@ html.light aside#persistent-mascot-widget .bg-amber-950\/30 {
   border-color: #FEF3C7 !important;
 }
 
+/* Ensure Mascot Widget sits strictly above mobile bottom nav on small screens, and at the bottom corner on desktop */
+#persistent-mascot-widget {
+  bottom: calc(4rem + var(--safe-bottom, 0px) + 0.875rem);
+}
+
+@media (min-width: 1024px) {
+  #persistent-mascot-widget {
+    bottom: 1.5rem !important;
+  }
+}
+

@@ -81,8 +81,11 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
       </div>
 
       {/* Bottom Footer */}
-      <div className="relative z-10 text-center text-[11px] text-slate-500 font-sans tracking-widest pb-1">
-        <span>PLANIX SYSTEM</span>
+      <div className="relative z-10 text-center flex flex-col items-center gap-1 pb-1">
+        <span className="text-[10px] text-slate-500 font-sans tracking-widest">PLANIX SYSTEM</span>
+        <span className="text-[11px] text-slate-400 font-medium">
+          ساخته شده در <span className="text-purple-400 font-bold">رومی لند</span> توسط <span className="text-purple-400 font-bold">یگانه بابایی</span>
+        </span>
       </div>
     </div>
   );

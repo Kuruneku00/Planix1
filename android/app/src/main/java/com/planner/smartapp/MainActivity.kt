@@ -115,20 +115,7 @@ class MainActivity : BridgeActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         splashScreen.setOnExitAnimationListener { splashScreenViewProvider ->
-            val fadeOut = android.animation.ObjectAnimator.ofFloat(
-                splashScreenViewProvider.view,
-                android.view.View.ALPHA,
-                1f,
-                0f
-            )
-            fadeOut.interpolator = android.view.animation.DecelerateInterpolator()
-            fadeOut.duration = 750L
-            fadeOut.addListener(object : android.animation.AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: android.animation.Animator) {
-                    splashScreenViewProvider.remove()
-                }
-            })
-            fadeOut.start()
+            splashScreenViewProvider.remove()
         }
 
         // Configure edge-to-edge BEFORE the Activity/WebView is created.

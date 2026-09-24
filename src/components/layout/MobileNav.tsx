@@ -290,6 +290,16 @@ export const MobileNav: React.FC<MobileNavProps> = ({ drawerOpen, setDrawerOpen 
                     </button>
                   );
                 })}
+
+                {/* Creator Attribution inside Drawer */}
+                <div className="col-span-2 pt-4 pb-2 text-center border-t border-slate-200/70 dark:border-slate-800/80 mt-2">
+                  <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                    ساخته شده در <span className="text-[#8B3DFF] font-extrabold">رومی لند</span> توسط <span className="text-[#8B3DFF] font-extrabold">یگانه بابایی</span>
+                  </p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 font-mono">
+                    Planix Smart System • تمامی حقوق محفوظ است
+                  </p>
+                </div>
               </div>
             </motion.div>
           </div>
