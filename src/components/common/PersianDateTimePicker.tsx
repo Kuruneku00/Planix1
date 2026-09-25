@@ -14,6 +14,7 @@ import {
   formatJalaliNumeric,
 } from '../../utils/jalali';
 import { Calendar as CalendarIcon, Clock, ChevronRight, ChevronLeft, ChevronDown, Check, X, ArrowLeft } from 'lucide-react';
+import { PersianMonthPicker } from './PersianMonthPicker';
 
 interface PersianDatePickerProps {
   value?: string; // Gregorian ISO: YYYY-MM-DD
@@ -369,21 +370,15 @@ export const PersianDatePicker: React.FC<PersianDatePickerProps> = ({
                 {/* Month Select */}
                 <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border border-purple-200 dark:border-slate-700 rounded-lg px-1.5 py-0.5">
                   <span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0">ماه:</span>
-                  <select
+                  <PersianMonthPicker
                     value={directMonthInput}
-                    onChange={(e) => {
-                      const m = Number(e.target.value);
+                    onChange={(m) => {
                       setDirectMonthInput(m);
                       setViewMonth(m);
                     }}
-                    className="bg-transparent text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer"
-                  >
-                    {PERSIAN_MONTH_NAMES.map((name, idx) => (
-                      <option key={idx} value={idx + 1} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
-                        {name}
-                      </option>
-                    ))}
-                  </select>
+                    variant="input"
+                    showNumber={false}
+                  />
                 </div>
 
                 {/* Year Input */}
@@ -437,22 +432,15 @@ export const PersianDatePicker: React.FC<PersianDatePickerProps> = ({
               </button>
 
               <div className="flex items-center gap-1.5 font-bold text-xs sm:text-sm text-purple-700 dark:text-purple-300">
-                <select
+                <PersianMonthPicker
                   value={viewMonth}
-                  onChange={(e) => {
-                    const m = Number(e.target.value);
+                  onChange={(m) => {
                     setViewMonth(m);
                     setDirectMonthInput(m);
                   }}
-                  className="bg-transparent font-bold text-xs sm:text-sm text-purple-700 dark:text-purple-300 rounded px-1 py-0.5 border-0 focus:ring-1 focus:ring-purple-500 cursor-pointer text-center"
-                  title="انتخاب ماه"
-                >
-                  {PERSIAN_MONTH_NAMES.map((name, idx) => (
-                    <option key={idx} value={idx + 1} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">
-                      {name}
-                    </option>
-                  ))}
-                </select>
+                  variant="header"
+                  showNumber={false}
+                />
 
                 <input
                   type="text"

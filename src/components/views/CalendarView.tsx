@@ -12,6 +12,7 @@ import {
   parseJalaliInput,
 } from '../../utils/jalali';
 import { Modal } from '../common/Modal';
+import { PersianMonthPicker } from '../common/PersianMonthPicker';
 import { CalendarEvent, Task } from '../../types';
 import {
   Calendar as CalendarIcon,
@@ -256,18 +257,13 @@ export const CalendarView: React.FC = () => {
               <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
 
-            <select
+            <PersianMonthPicker
               value={currentMonth}
-              onChange={(e) => handleMonthSelectChange(Number(e.target.value))}
-              className="bg-transparent text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 px-1.5 py-1 rounded-lg border border-purple-200 dark:border-slate-700 focus:outline-none focus:ring-1 focus:ring-purple-500 cursor-pointer text-center"
-              title="انتخاب ماه"
-            >
-              {monthNames.map((name, idx) => (
-                <option key={idx} value={idx + 1} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
-                  {name}
-                </option>
-              ))}
-            </select>
+              onChange={handleMonthSelectChange}
+              variant="header"
+              showNumber={false}
+              persianDigits={settings.persianDigits}
+            />
 
             <input
               type="text"
@@ -343,19 +339,15 @@ export const CalendarView: React.FC = () => {
             </div>
 
             {/* Month */}
-            <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 rounded-xl px-2 py-1">
+            <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 rounded-xl px-2 py-0.5">
               <span className="text-[11px] text-slate-500 dark:text-slate-400">ماه:</span>
-              <select
+              <PersianMonthPicker
                 value={currentMonth}
-                onChange={(e) => handleMonthSelectChange(Number(e.target.value))}
-                className="bg-transparent text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer"
-              >
-                {monthNames.map((name, idx) => (
-                  <option key={idx} value={idx + 1} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
-                    {name} ({idx + 1})
-                  </option>
-                ))}
-              </select>
+                onChange={handleMonthSelectChange}
+                variant="compact"
+                showNumber={true}
+                persianDigits={settings.persianDigits}
+              />
             </div>
 
             {/* Year */}
