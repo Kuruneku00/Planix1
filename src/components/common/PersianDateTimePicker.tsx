@@ -67,17 +67,31 @@ export const PersianDatePicker: React.FC<PersianDatePickerProps> = ({
   const [typedInput, setTypedInput] = useState<string>('');
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [directDayInput, setDirectDayInput] = useState<string>('');
+  const [directMonthInput, setDirectMonthInput] = useState<number>(
+    parsedCurrentJalali?.jm ?? todayJalali.jm
+  );
+  const [directYearInput, setDirectYearInput] = useState<string>(
+    String(parsedCurrentJalali?.jy ?? todayJalali.jy)
+  );
+
+  // Sync direct inputs when view changes
+  useEffect(() => {
+    setDirectMonthInput(viewMonth);
+    setDirectYearInput(String(viewYear));
+  }, [viewYear, viewMonth]);
 
   // When value changes from outside, sync view & input
   useEffect(() => {
     if (parsedCurrentJalali) {
       setViewYear(parsedCurrentJalali.jy);
       setViewMonth(parsedCurrentJalali.jm);
+      setDirectDayInput(String(parsedCurrentJalali.jd));
       if (!isTyping) {
         setTypedInput(formatJalaliNumeric(parsedCurrentJalali.jy, parsedCurrentJalali.jm, parsedCurrentJalali.jd));
       }
     } else if (!isTyping) {
       setTypedInput('');
+      setDirectDayInput('');
     }
   }, [parsedCurrentJalali, isTyping]);
 
@@ -136,14 +150,34 @@ export const PersianDatePicker: React.FC<PersianDatePickerProps> = ({
     setDirectDayInput('');
   };
 
-  const handleDirectDaySubmit = (e?: React.FormEvent) => {
+  const handleDirectDateSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    const clean = toEnglishDigits(directDayInput).trim();
-    const dayNum = parseInt(clean, 10);
-    if (!isNaN(dayNum) && dayNum >= 1 && dayNum <= daysInMonth) {
-      selectJalaliDay(dayNum);
+    const cleanDay = toEnglishDigits(directDayInput).trim();
+    const dayNum = parseInt(cleanDay, 10);
+    const cleanYear = toEnglishDigits(directYearInput).trim();
+    const yearNum = parseInt(cleanYear, 10);
+    const monthNum = directMonthInput;
+
+    const targetYear = !isNaN(yearNum) && yearNum >= 1300 && yearNum <= 1500 ? yearNum : viewYear;
+    const targetMonth = monthNum >= 1 && monthNum <= 12 ? monthNum : viewMonth;
+    const maxDays = getJalaliMonthDays(targetYear, targetMonth);
+
+    if (!isNaN(dayNum) && dayNum >= 1 && dayNum <= maxDays) {
+      const gDate = jalaliToGregorian(targetYear, targetMonth, dayNum);
+      const iso = `${gDate.gy}-${String(gDate.gm).padStart(2, '0')}-${String(gDate.gd).padStart(2, '0')}`;
+      onChange(iso);
+      setViewYear(targetYear);
+      setViewMonth(targetMonth);
+      setTypedInput(formatJalaliNumeric(targetYear, targetMonth, dayNum));
+      setIsOpen(false);
+      setDirectDayInput('');
+    } else {
+      setViewYear(targetYear);
+      setViewMonth(targetMonth);
     }
   };
+
+  const handleDirectDaySubmit = handleDirectDateSubmit;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsTyping(true);
@@ -302,55 +336,153 @@ export const PersianDatePicker: React.FC<PersianDatePickerProps> = ({
             onClick={() => setIsOpen(false)}
           />
 
-          <div className="fixed inset-x-3 bottom-[calc(4.5rem+var(--safe-bottom))] sm:bottom-auto sm:inset-x-auto sm:absolute sm:right-0 sm:mt-1.5 w-auto sm:w-84 p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/90 shadow-2xl shadow-purple-950/30 text-slate-800 dark:text-slate-100 z-50 max-w-[95vw] mx-auto animate-in fade-in sm:zoom-in-95 duration-150">
-            {/* Direct Day Typing Section */}
-            <form
-              onSubmit={handleDirectDaySubmit}
-              className="flex items-center gap-1.5 mb-2.5 p-1.5 rounded-xl bg-purple-50/50 dark:bg-slate-800/80 border border-purple-200/80 dark:border-slate-700/60 shadow-2xs"
-            >
-              <span className="text-[11px] font-semibold text-purple-900 dark:text-slate-300 shrink-0">
-                تایپ روز:
-              </span>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={directDayInput}
-                onChange={(e) => setDirectDayInput(e.target.value)}
-                placeholder={`۱ تا ${daysInMonth}`}
-                className="w-16 h-7 text-center text-xs font-mono font-bold rounded-lg bg-white dark:bg-slate-900 border border-purple-300 dark:border-slate-700 text-purple-700 dark:text-purple-300 focus:outline-none focus:border-purple-500 shadow-2xs"
-              />
-              <button
-                type="submit"
-                disabled={!directDayInput.trim()}
-                className="h-7 px-2.5 rounded-lg bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white text-[11px] font-medium transition cursor-pointer shadow-xs"
-              >
-                انتخاب روز
-              </button>
-              <span className="text-[10px] text-purple-700/70 dark:text-slate-400 mr-auto hidden sm:inline font-mono">
-                ماه {PERSIAN_MONTH_NAMES[viewMonth - 1]}
-              </span>
-            </form>
+          <div className="fixed inset-x-3 bottom-[calc(4.5rem+var(--safe-bottom))] sm:bottom-auto sm:inset-x-auto sm:absolute sm:right-0 sm:mt-1.5 w-auto sm:w-88 p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/90 shadow-2xl shadow-purple-950/30 text-slate-800 dark:text-slate-100 z-50 max-w-[95vw] mx-auto animate-in fade-in sm:zoom-in-95 duration-150">
+            {/* Direct Day, Month & Year Typing Section */}
+            <div className="mb-2.5 p-2 rounded-xl bg-purple-50/60 dark:bg-slate-800/80 border border-purple-200/80 dark:border-slate-700/60 shadow-2xs space-y-1.5">
+              <div className="flex items-center justify-between text-[11px] font-semibold text-purple-900 dark:text-purple-300">
+                <span>تایپ و تنظیم سریع تاریخ:</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
+                  {toPersianDigits(daysInMonth)} روز
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {/* Day Input */}
+                <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border border-purple-200 dark:border-slate-700 rounded-lg px-1.5 py-0.5">
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0">روز:</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={directDayInput}
+                    onChange={(e) => setDirectDayInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleDirectDateSubmit();
+                      }
+                    }}
+                    placeholder={`۱-${daysInMonth}`}
+                    className="w-10 text-center text-xs font-mono font-bold text-purple-700 dark:text-purple-300 bg-transparent focus:outline-none"
+                    title={`شماره روز (۱ تا ${daysInMonth})`}
+                  />
+                </div>
+
+                {/* Month Select */}
+                <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border border-purple-200 dark:border-slate-700 rounded-lg px-1.5 py-0.5">
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0">ماه:</span>
+                  <select
+                    value={directMonthInput}
+                    onChange={(e) => {
+                      const m = Number(e.target.value);
+                      setDirectMonthInput(m);
+                      setViewMonth(m);
+                    }}
+                    className="bg-transparent text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer"
+                  >
+                    {PERSIAN_MONTH_NAMES.map((name, idx) => (
+                      <option key={idx} value={idx + 1} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+                        {name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Year Input */}
+                <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border border-purple-200 dark:border-slate-700 rounded-lg px-1.5 py-0.5">
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0">سال:</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={directYearInput}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setDirectYearInput(val);
+                      const clean = toEnglishDigits(val).trim();
+                      const y = parseInt(clean, 10);
+                      if (!isNaN(y) && y >= 1300 && y <= 1500) {
+                        setViewYear(y);
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleDirectDateSubmit();
+                      }
+                    }}
+                    placeholder="۱۴۰۳"
+                    className="w-14 text-center text-xs font-mono font-bold text-purple-700 dark:text-purple-300 bg-transparent focus:outline-none"
+                    title="سال شمسی (مثلاً ۱۴۰۳ یا ۱۴۰۴)"
+                  />
+                </div>
+
+                {/* Submit button */}
+                <button
+                  type="button"
+                  onClick={() => handleDirectDateSubmit()}
+                  className="h-6.5 px-2.5 rounded-lg bg-purple-600 hover:bg-purple-500 active:scale-95 text-white text-[11px] font-medium transition cursor-pointer shadow-xs mr-auto"
+                >
+                  تأیید
+                </button>
+              </div>
+            </div>
 
             {/* Calendar Header: Month & Year Nav */}
-            <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-purple-100 dark:border-slate-800">
+            <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-purple-100 dark:border-slate-800 gap-1">
               <button
                 type="button"
                 onClick={handlePrevMonth}
-                className="p-1.5 rounded-lg hover:bg-purple-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-purple-700 dark:hover:text-white transition cursor-pointer"
+                className="p-1.5 rounded-lg hover:bg-purple-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-purple-700 dark:hover:text-white transition cursor-pointer shrink-0"
                 title="ماه قبل"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
 
-              <div className="flex items-center gap-2 font-bold text-xs sm:text-sm text-purple-700 dark:text-purple-300">
-                <span>{PERSIAN_MONTH_NAMES[viewMonth - 1]}</span>
-                <span className="font-mono">{toPersianDigits(viewYear)}</span>
+              <div className="flex items-center gap-1.5 font-bold text-xs sm:text-sm text-purple-700 dark:text-purple-300">
+                <select
+                  value={viewMonth}
+                  onChange={(e) => {
+                    const m = Number(e.target.value);
+                    setViewMonth(m);
+                    setDirectMonthInput(m);
+                  }}
+                  className="bg-transparent font-bold text-xs sm:text-sm text-purple-700 dark:text-purple-300 rounded px-1 py-0.5 border-0 focus:ring-1 focus:ring-purple-500 cursor-pointer text-center"
+                  title="انتخاب ماه"
+                >
+                  {PERSIAN_MONTH_NAMES.map((name, idx) => (
+                    <option key={idx} value={idx + 1} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">
+                      {name}
+                    </option>
+                  ))}
+                </select>
+
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={directYearInput}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setDirectYearInput(val);
+                    const clean = toEnglishDigits(val).trim();
+                    const y = parseInt(clean, 10);
+                    if (!isNaN(y) && y >= 1300 && y <= 1500) {
+                      setViewYear(y);
+                    }
+                  }}
+                  onBlur={() => {
+                    const clean = toEnglishDigits(directYearInput).trim();
+                    const y = parseInt(clean, 10);
+                    if (isNaN(y) || y < 1300 || y > 1500) {
+                      setDirectYearInput(String(viewYear));
+                    }
+                  }}
+                  className="w-14 text-center font-mono font-bold text-xs sm:text-sm rounded bg-purple-50 dark:bg-slate-800 border border-purple-200 dark:border-slate-700 text-purple-700 dark:text-purple-300 px-1 py-0.5 focus:outline-none focus:border-purple-500"
+                  title="تایپ یا تغییر سال"
+                />
               </div>
 
               <button
                 type="button"
                 onClick={handleNextMonth}
-                className="p-1.5 rounded-lg hover:bg-purple-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-purple-700 dark:hover:text-white transition cursor-pointer"
+                className="p-1.5 rounded-lg hover:bg-purple-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-purple-700 dark:hover:text-white transition cursor-pointer shrink-0"
                 title="ماه بعد"
               >
                 <ChevronLeft className="w-4 h-4" />

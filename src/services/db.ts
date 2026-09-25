@@ -892,6 +892,93 @@ class DatabaseService {
     }
   }
 
+  mergeBackupData(jsonString: string): { success: boolean; message: string; countMerged: number } {
+    try {
+      const data = JSON.parse(jsonString);
+      if (!data || typeof data !== 'object') {
+        return { success: false, message: 'بسته همگام‌سازی نامعتبر است.', countMerged: 0 };
+      }
+
+      let count = 0;
+
+      const mergeList = <T extends { id: string; updatedAt?: string; createdAt?: string }>(
+        key: string,
+        incoming: T[] | undefined,
+        getter: () => T[]
+      ) => {
+        if (!Array.isArray(incoming) || incoming.length === 0) return;
+        const current = getter();
+        const map = new Map<string, T>();
+        current.forEach((item) => map.set(item.id, item));
+        incoming.forEach((item) => {
+          if (!item || !item.id) return;
+          if (!map.has(item.id)) {
+            map.set(item.id, item);
+            count++;
+          } else {
+            const existing = map.get(item.id)!;
+            const existingTime = new Date(existing.updatedAt || existing.createdAt || 0).getTime();
+            const incomingTime = new Date(item.updatedAt || item.createdAt || 0).getTime();
+            if (incomingTime >= existingTime) {
+              map.set(item.id, { ...existing, ...item });
+              count++;
+            }
+          }
+        });
+        this.set(key, Array.from(map.values()));
+      };
+
+      mergeList(STORAGE_KEYS.TASKS, data.tasks, () => this.getTasks());
+      mergeList(STORAGE_KEYS.PROJECTS, data.projects, () => this.getProjects());
+      mergeList(STORAGE_KEYS.GOALS, data.goals, () => this.getGoals());
+      mergeList(STORAGE_KEYS.HABITS, data.habits, () => this.getHabits());
+      mergeList(STORAGE_KEYS.NOTES, data.notes, () => this.getNotes());
+      mergeList(STORAGE_KEYS.EVENTS, data.events, () => this.getEvents());
+      mergeList(STORAGE_KEYS.REMINDERS, data.reminders, () => this.getReminders());
+      mergeList(STORAGE_KEYS.POMODORO_SESSIONS, data.pomodoroSessions, () => this.getPomodoroSessions());
+      mergeList(STORAGE_KEYS.TIME_ENTRIES, data.timeEntries, () => this.getTimeEntries());
+      mergeList(STORAGE_KEYS.TEMPLATES, data.templates, () => this.getTemplates());
+      mergeList(STORAGE_KEYS.FILES, data.files, () => this.getFiles());
+
+      // Daily plans (keyed by date)
+      if (Array.isArray(data.dailyPlans)) {
+        const currentPlans = this.getDailyPlans();
+        const planMap = new Map(currentPlans.map((p) => [p.date, p]));
+        data.dailyPlans.forEach((plan: any) => {
+          if (plan?.date) {
+            planMap.set(plan.date, plan);
+            count++;
+          }
+        });
+        this.set(STORAGE_KEYS.DAILY_PLANS, Array.from(planMap.values()));
+      }
+
+      // Habit logs
+      if (Array.isArray(data.habitLogs)) {
+        const currentLogs = this.getHabitLogs();
+        const logMap = new Map(currentLogs.map((l) => [l.id || `${l.habitId}_${l.date}`, l]));
+        data.habitLogs.forEach((log: any) => {
+          const k = log.id || `${log.habitId}_${log.date}`;
+          if (k) {
+            logMap.set(k, log);
+            count++;
+          }
+        });
+        this.set(STORAGE_KEYS.HABIT_LOGS, Array.from(logMap.values()));
+      }
+
+      window.dispatchEvent(new CustomEvent('planner_db_updated', { detail: { key: 'all' } }));
+
+      return {
+        success: true,
+        message: `اطلاعات با موفقیت ادغام شد (${count} رکورد به‌روز یا افزوده شد).`,
+        countMerged: count,
+      };
+    } catch {
+      return { success: false, message: 'خطا در پردازش بسته داده همگام‌سازی.', countMerged: 0 };
+    }
+  }
+
   importDatabaseJSON(jsonString: string): boolean {
     const res = this.importBackupData(jsonString);
     return res.success;

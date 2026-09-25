@@ -43,6 +43,7 @@ export const CalendarView: React.FC = () => {
 
   // Direct typing states for selecting days and dates
   const [dayInputText, setDayInputText] = useState<string>(String(jDay));
+  const [yearInputText, setYearInputText] = useState<string>(String(jYear));
   const [dateJumpText, setDateJumpText] = useState<string>('');
 
   // Database events and tasks
@@ -70,7 +71,11 @@ export const CalendarView: React.FC = () => {
   const handlePrevMonth = () => {
     if (currentMonth === 1) {
       setCurrentMonth(12);
-      setCurrentYear((prev) => prev - 1);
+      setCurrentYear((prev) => {
+        const y = prev - 1;
+        setYearInputText(String(y));
+        return y;
+      });
     } else {
       setCurrentMonth((prev) => prev - 1);
     }
@@ -79,7 +84,11 @@ export const CalendarView: React.FC = () => {
   const handleNextMonth = () => {
     if (currentMonth === 12) {
       setCurrentMonth(1);
-      setCurrentYear((prev) => prev + 1);
+      setCurrentYear((prev) => {
+        const y = prev + 1;
+        setYearInputText(String(y));
+        return y;
+      });
     } else {
       setCurrentMonth((prev) => prev + 1);
     }
@@ -90,6 +99,7 @@ export const CalendarView: React.FC = () => {
     setCurrentMonth(jMonth);
     setSelectedDay(jDay);
     setDayInputText(String(jDay));
+    setYearInputText(String(jYear));
     setSelectedDateIso(toGregorianIsoDate());
   };
 
@@ -120,6 +130,50 @@ export const CalendarView: React.FC = () => {
     }
   };
 
+  const handleYearInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setYearInputText(val);
+    const clean = toEnglishDigits(val).trim();
+    const y = parseInt(clean, 10);
+    if (!isNaN(y) && y >= 1300 && y <= 1500) {
+      setCurrentYear(y);
+      const maxDays = getJalaliMonthDays(y, currentMonth);
+      const newDay = Math.min(selectedDay, maxDays);
+      setSelectedDay(newDay);
+      setDayInputText(String(newDay));
+      const { gy, gm, gd } = jalaliToGregorian(y, currentMonth, newDay);
+      setSelectedDateIso(`${gy}-${String(gm).padStart(2, '0')}-${String(gd).padStart(2, '0')}`);
+    }
+  };
+
+  const handleMonthSelectChange = (newMonth: number) => {
+    setCurrentMonth(newMonth);
+    const maxDays = getJalaliMonthDays(currentYear, newMonth);
+    const newDay = Math.min(selectedDay, maxDays);
+    setSelectedDay(newDay);
+    setDayInputText(String(newDay));
+    const { gy, gm, gd } = jalaliToGregorian(currentYear, newMonth, newDay);
+    setSelectedDateIso(`${gy}-${String(gm).padStart(2, '0')}-${String(gd).padStart(2, '0')}`);
+  };
+
+  const handleApplyDirectDate = () => {
+    const cleanDay = toEnglishDigits(dayInputText).trim();
+    const dayNum = parseInt(cleanDay, 10);
+    const cleanYear = toEnglishDigits(yearInputText).trim();
+    const yearNum = parseInt(cleanYear, 10);
+    const y = !isNaN(yearNum) && yearNum >= 1300 && yearNum <= 1500 ? yearNum : currentYear;
+    const maxDays = getJalaliMonthDays(y, currentMonth);
+    const d = !isNaN(dayNum) && dayNum >= 1 && dayNum <= maxDays ? dayNum : Math.min(selectedDay, maxDays);
+
+    setCurrentYear(y);
+    setSelectedDay(d);
+    setDayInputText(String(d));
+    setYearInputText(String(y));
+    const { gy, gm, gd } = jalaliToGregorian(y, currentMonth, d);
+    setSelectedDateIso(`${gy}-${String(gm).padStart(2, '0')}-${String(gd).padStart(2, '0')}`);
+    showToast(`تاریخ انتخاب شد: ${y}/${currentMonth}/${d}`, 'success');
+  };
+
   const handleJumpToDate = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const parsed = parseJalaliInput(dateJumpText);
@@ -129,6 +183,7 @@ export const CalendarView: React.FC = () => {
     }
     setCurrentYear(parsed.jy);
     setCurrentMonth(parsed.jm);
+    setYearInputText(String(parsed.jy));
     handleSelectDay(parsed.jd);
     showToast(`انتقال به تاریخ ${parsed.jy}/${parsed.jm}/${parsed.jd}`, 'success');
     setDateJumpText('');
@@ -191,7 +246,7 @@ export const CalendarView: React.FC = () => {
 
         <div className="flex items-center justify-between sm:justify-end gap-1.5 sm:gap-2">
           {/* Month & Year Selector */}
-          <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1 rounded-xl shadow-xs">
+          <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1 rounded-xl shadow-xs">
             <button
               type="button"
               onClick={handlePrevMonth}
@@ -201,9 +256,34 @@ export const CalendarView: React.FC = () => {
               <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
 
-            <span className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 px-2 min-w-[110px] sm:min-w-[130px] text-center">
-              {monthNames[currentMonth - 1]} {settings.persianDigits ? toPersianDigits(currentYear) : currentYear}
-            </span>
+            <select
+              value={currentMonth}
+              onChange={(e) => handleMonthSelectChange(Number(e.target.value))}
+              className="bg-transparent text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 px-1.5 py-1 rounded-lg border border-purple-200 dark:border-slate-700 focus:outline-none focus:ring-1 focus:ring-purple-500 cursor-pointer text-center"
+              title="انتخاب ماه"
+            >
+              {monthNames.map((name, idx) => (
+                <option key={idx} value={idx + 1} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+                  {name}
+                </option>
+              ))}
+            </select>
+
+            <input
+              type="text"
+              inputMode="numeric"
+              value={yearInputText}
+              onChange={handleYearInputChange}
+              onBlur={() => {
+                const clean = toEnglishDigits(yearInputText).trim();
+                const y = parseInt(clean, 10);
+                if (isNaN(y) || y < 1300 || y > 1500) {
+                  setYearInputText(String(currentYear));
+                }
+              }}
+              className="w-14 sm:w-16 text-center text-xs sm:text-sm font-bold font-mono text-purple-600 dark:text-purple-300 bg-purple-50/50 dark:bg-slate-800/80 rounded-lg px-1 py-1 border border-purple-200 dark:border-slate-700 focus:outline-none focus:border-purple-500"
+              title="تایپ یا تغییر سال"
+            />
 
             <button
               type="button"
@@ -234,31 +314,82 @@ export const CalendarView: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Day & Date Input Bar - امکان تایپ مستقیم شماره روز و پرش به تاریخ */}
-      <div className="p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-        {/* Direct Day Typing */}
-        <div className="flex items-center gap-2">
+      {/* Quick Day, Month & Year Direct Input Bar */}
+      <div className="p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs">
+        {/* Direct Day, Month & Year Typing */}
+        <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 shrink-0">
-            تایپ و انتخاب روز:
+            تایپ و تنظیم سریع تاریخ:
           </span>
-          <div className="flex items-center gap-1.5">
-            <input
-              type="text"
-              inputMode="numeric"
-              value={dayInputText}
-              onChange={handleDayInputChange}
-              placeholder={`۱ تا ${daysInMonth}`}
-              className="w-16 sm:w-20 h-9 text-center text-xs sm:text-sm font-bold font-mono rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-purple-600 dark:text-purple-300 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/40"
-              title="تایپ شماره روز برای انتخاب آنی در تقویم"
-            />
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
-              از {settings.persianDigits ? toPersianDigits(daysInMonth) : daysInMonth} روز این ماه
-            </span>
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Day */}
+            <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 rounded-xl px-2 py-1">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">روز:</span>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={dayInputText}
+                onChange={handleDayInputChange}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleApplyDirectDate();
+                  }
+                }}
+                placeholder={`۱-${daysInMonth}`}
+                className="w-10 sm:w-12 text-center text-xs sm:text-sm font-bold font-mono text-purple-600 dark:text-purple-300 bg-transparent focus:outline-none"
+                title={`شماره روز (۱ تا ${daysInMonth})`}
+              />
+            </div>
+
+            {/* Month */}
+            <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 rounded-xl px-2 py-1">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">ماه:</span>
+              <select
+                value={currentMonth}
+                onChange={(e) => handleMonthSelectChange(Number(e.target.value))}
+                className="bg-transparent text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer"
+              >
+                {monthNames.map((name, idx) => (
+                  <option key={idx} value={idx + 1} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+                    {name} ({idx + 1})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Year */}
+            <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 rounded-xl px-2 py-1">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">سال:</span>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={yearInputText}
+                onChange={handleYearInputChange}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleApplyDirectDate();
+                  }
+                }}
+                placeholder="۱۴۰۳"
+                className="w-14 sm:w-16 text-center text-xs sm:text-sm font-bold font-mono text-purple-600 dark:text-purple-300 bg-transparent focus:outline-none"
+                title="سال شمسی (مثلاً ۱۴۰۳ یا ۱۴۰۴)"
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={handleApplyDirectDate}
+              className="h-8.5 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-95 text-white text-xs font-medium transition cursor-pointer shadow-xs"
+            >
+              تأیید
+            </button>
           </div>
         </div>
 
         {/* Full Jalali Date Jump */}
-        <form onSubmit={handleJumpToDate} className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 shrink-0">
             پرش به تاریخ:
           </span>
@@ -266,17 +397,24 @@ export const CalendarView: React.FC = () => {
             type="text"
             value={dateJumpText}
             onChange={(e) => setDateJumpText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleJumpToDate();
+              }
+            }}
             placeholder="مثلاً: ۱۴۰۳/۰۷/۱۵"
             className="w-32 sm:w-36 h-9 px-2.5 text-center text-xs font-mono rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-purple-500"
           />
           <button
-            type="submit"
+            type="button"
+            onClick={() => handleJumpToDate()}
             disabled={!dateJumpText.trim()}
             className="h-9 px-3.5 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white text-xs font-medium transition cursor-pointer shrink-0"
           >
             برو
           </button>
-        </form>
+        </div>
       </div>
 
       {/* Main Grid Layout: Calendar Matrix + Day Sidebar */}
