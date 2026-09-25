@@ -125,16 +125,28 @@ jobs:
             exit 1
           fi
 
-          mkdir -p android/keystore
+          mkdir -p android/app/keystore
 
-          echo "$KEYSTORE_BASE64" | base64 --decode > android/keystore/release.jks
+          echo "$KEYSTORE_BASE64" | base64 --decode > android/app/keystore/release.jks
 
-          if [ ! -s android/keystore/release.jks ]; then
+          if [ ! -s android/app/keystore/release.jks ]; then
             echo "ERROR: Keystore file was not created."
             exit 1
           fi
 
           echo "Release keystore restored successfully."
+
+      - name: Verify keystore file
+        shell: bash
+        run: |
+          set -e
+
+          test -f android/app/keystore/release.jks
+          test -s android/app/keystore/release.jks
+
+          ls -lh android/app/keystore/release.jks
+
+          echo "Keystore file verified successfully."
 
       - name: Prepare Gradle
         working-directory: android
@@ -197,4 +209,4 @@ jobs:
         if: always()
         shell: bash
         run: |
-          rm -f android/keystore/release.jks
+          rm -f android/app/keystore/release.jks
