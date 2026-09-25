@@ -120,24 +120,24 @@ export const WeeklyPlannerView: React.FC = () => {
           return (
             <div
               key={day.dateIso}
-              className={`p-3.5 rounded-2xl border flex flex-col justify-between min-h-[350px] transition ${
+              className={`p-3.5 rounded-2xl border flex flex-col justify-between min-h-[350px] transition shadow-2xs ${
                 day.isToday
-                  ? 'bg-purple-950/20 border-purple-600/60 ring-1 ring-purple-600/40'
-                  : 'bg-slate-900/80 border-slate-800'
+                  ? 'bg-purple-50/70 dark:bg-purple-950/20 border-purple-400 dark:border-purple-600/60 ring-1 ring-purple-400/40'
+                  : 'bg-white dark:bg-slate-900/80 border-slate-200 dark:border-slate-800'
               }`}
             >
               {/* Day Header */}
               <div>
-                <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-800">
+                <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-100 dark:border-slate-800">
                   <div>
                     <h4
                       className={`text-xs font-bold ${
-                        day.isFriday ? 'text-rose-400' : 'text-slate-200'
+                        day.isFriday ? 'text-rose-500 dark:text-rose-400' : 'text-slate-800 dark:text-slate-200'
                       }`}
                     >
                       {day.name}
                     </h4>
-                    <span className="text-[10px] text-slate-400 font-mono">{day.jalaliStr}</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">{day.jalaliStr}</span>
                   </div>
 
                   {day.isToday && (
@@ -150,7 +150,7 @@ export const WeeklyPlannerView: React.FC = () => {
                 {/* Day Tasks List */}
                 <div className="space-y-1.5 max-h-64 overflow-y-auto">
                   {dayTasks.length === 0 ? (
-                    <div className="text-center py-6 text-[11px] text-slate-600">
+                    <div className="text-center py-6 text-[11px] text-slate-400 dark:text-slate-600">
                       وظیفه‌ای نیست
                     </div>
                   ) : (
@@ -160,15 +160,15 @@ export const WeeklyPlannerView: React.FC = () => {
                         onClick={() => handleToggleTask(task.id)}
                         className={`p-2 rounded-xl text-xs border transition cursor-pointer flex items-start gap-2 ${
                           task.status === 'completed'
-                            ? 'bg-slate-800/20 border-slate-800/40 text-slate-500 line-through'
-                            : 'bg-slate-800/60 border-slate-700/50 text-slate-200 hover:border-purple-800/50'
+                            ? 'bg-slate-50 dark:bg-slate-800/20 border-slate-200/60 dark:border-slate-800/40 text-slate-400 line-through'
+                            : 'bg-purple-50/40 dark:bg-slate-800/60 border-purple-100 dark:border-slate-700/50 text-slate-800 dark:text-slate-200 hover:border-purple-300 dark:hover:border-purple-800/50'
                         }`}
                       >
                         <button type="button" className="mt-0.5 flex-shrink-0">
                           {task.status === 'completed' ? (
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
                           ) : (
-                            <Circle className="w-3.5 h-3.5 text-slate-500" />
+                            <Circle className="w-3.5 h-3.5 text-slate-400" />
                           )}
                         </button>
                         <span className="truncate leading-tight">{task.title}</span>
@@ -181,8 +181,8 @@ export const WeeklyPlannerView: React.FC = () => {
               {/* Day Footer / Quick Add */}
               <button
                 type="button"
-                onClick={() => openQuickAdd('task')}
-                className="w-full mt-3 py-1.5 rounded-xl bg-slate-800/40 hover:bg-slate-800 text-slate-400 hover:text-purple-300 text-[11px] border border-slate-800/80 transition flex items-center justify-center gap-1 cursor-pointer"
+                onClick={() => openQuickAdd('task', { dueDate: day.dateIso })}
+                className="w-full mt-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 text-purple-700 dark:text-purple-300 text-[11px] font-semibold border border-purple-200 dark:border-slate-700 transition flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
               >
                 <Plus className="w-3 h-3" />
                 <span>افزودن</span>

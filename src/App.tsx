@@ -12,6 +12,7 @@ import { PersistentMascotWidget } from './components/mascot/PersistentMascotWidg
 import { ToastContainer } from './components/common/ToastContainer';
 import { ConfirmationModal } from './components/common/ConfirmationModal';
 import { PermissionSetupModal } from './components/common/PermissionSetupModal';
+import { ActiveAlarmBanner } from './components/common/ActiveAlarmBanner';
 
 // Authentication, Permissions & Onboarding Lifecycle
 import { SplashScreen } from './components/auth/SplashScreen';
@@ -159,6 +160,9 @@ const MainLayout: React.FC = () => {
 
       {/* Global Confirmation Modal */}
       <ConfirmationModal />
+
+      {/* Global Active Alarm & Ringing Banner */}
+      <ActiveAlarmBanner />
 
       {/* Global Toast Notifications */}
       <ToastContainer />

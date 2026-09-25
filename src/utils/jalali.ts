@@ -416,3 +416,71 @@ export function getCurrentPersianWeekDays(refDate: Date = new Date()): {
   }
   return days;
 }
+
+/**
+ * Parses a typed Jalali date string in various formats:
+ * - "1403/07/15", "1403-07-15", "1403.07.15", "1403 07 15"
+ * - "14030715" (8 digits)
+ * - "07/15", "7/15" (assumes current Jalali year)
+ * Converts Persian digits to English digits first.
+ */
+export function parseJalaliInput(input: string): JalaliDate | null {
+  if (!input) return null;
+  const clean = toEnglishDigits(input).trim();
+  if (!clean) return null;
+
+  // Try 8 digits YYYYMMDD e.g. 14030715
+  if (/^\d{8}$/.test(clean)) {
+    const jy = parseInt(clean.substring(0, 4), 10);
+    const jm = parseInt(clean.substring(4, 6), 10);
+    const jd = parseInt(clean.substring(6, 8), 10);
+    if (jy >= 1300 && jy <= 1500 && jm >= 1 && jm <= 12) {
+      const maxDays = getJalaliMonthDays(jy, jm);
+      if (jd >= 1 && jd <= maxDays) {
+        return { jy, jm, jd };
+      }
+    }
+  }
+
+  // Try standard delimiter: YYYY/MM/DD or YYYY-MM-DD or YYYY.MM.DD
+  const parts = clean.split(/[-/.\s]+/);
+  if (parts.length === 3) {
+    const jy = parseInt(parts[0], 10);
+    const jm = parseInt(parts[1], 10);
+    const jd = parseInt(parts[2], 10);
+    if (!isNaN(jy) && !isNaN(jm) && !isNaN(jd)) {
+      if (jy >= 1300 && jy <= 1500 && jm >= 1 && jm <= 12) {
+        const maxDays = getJalaliMonthDays(jy, jm);
+        if (jd >= 1 && jd <= maxDays) {
+          return { jy, jm, jd };
+        }
+      }
+    }
+  }
+
+  // Try MM/DD (current year)
+  if (parts.length === 2) {
+    const currentJy = getTodayJalali().jy;
+    const jm = parseInt(parts[0], 10);
+    const jd = parseInt(parts[1], 10);
+    if (!isNaN(jm) && !isNaN(jd) && jm >= 1 && jm <= 12) {
+      const maxDays = getJalaliMonthDays(currentJy, jm);
+      if (jd >= 1 && jd <= maxDays) {
+        return { jy: currentJy, jm, jd };
+      }
+    }
+  }
+
+  return null;
+}
+
+export function parseJalaliToGregorianIso(input: string): string | null {
+  const j = parseJalaliInput(input);
+  if (!j) return null;
+  const g = jalaliToGregorian(j.jy, j.jm, j.jd);
+  return `${g.gy}-${String(g.gm).padStart(2, '0')}-${String(g.gd).padStart(2, '0')}`;
+}
+
+export function formatJalaliNumeric(jy: number, jm: number, jd: number): string {
+  return `${jy}/${String(jm).padStart(2, '0')}/${String(jd).padStart(2, '0')}`;
+}

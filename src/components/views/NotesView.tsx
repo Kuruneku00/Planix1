@@ -100,14 +100,14 @@ export const NotesView: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-2xs">
         <div className="relative flex-1">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="جستجو در عنوان یا متن یادداشت‌ها..."
-            className="w-full pl-3 pr-9 py-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 text-xs focus:outline-none focus:border-purple-500"
+            className="w-full pl-3 pr-9 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs focus:outline-none focus:border-purple-500 shadow-2xs"
           />
           <Search className="w-4 h-4 text-slate-400 absolute right-3 top-2.5" />
         </div>
@@ -117,10 +117,10 @@ export const NotesView: React.FC = () => {
             <button
               type="button"
               onClick={() => setSelectedTag('all')}
-              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer font-medium ${
                 selectedTag === 'all'
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-slate-800 text-slate-400 hover:text-slate-200'
+                  ? 'bg-purple-600 text-white shadow-xs'
+                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-400 hover:text-purple-700 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-2xs'
               }`}
             >
               همه
@@ -130,10 +130,10 @@ export const NotesView: React.FC = () => {
                 key={t}
                 type="button"
                 onClick={() => setSelectedTag(t)}
-                className={`px-2.5 py-1.5 rounded-lg transition cursor-pointer ${
+                className={`px-2.5 py-1.5 rounded-lg transition cursor-pointer font-medium ${
                   selectedTag === t
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-slate-800 text-slate-400 hover:text-slate-200'
+                    ? 'bg-purple-600 text-white shadow-xs'
+                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-400 hover:text-purple-700 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-2xs'
                 }`}
               >
                 #{t}
@@ -233,31 +233,31 @@ export const NotesView: React.FC = () => {
         >
           <form onSubmit={handleUpdateNote} className="space-y-4" dir="rtl">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">عنوان یادداشت *</label>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">عنوان یادداشت *</label>
               <input
                 type="text"
                 required
                 value={editingNote.title}
                 onChange={(e) => setEditingNote({ ...editingNote, title: e.target.value })}
-                className="h-11 w-full px-3.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-purple-500 transition"
+                className="h-11 w-full px-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-purple-500 transition shadow-2xs"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">متن یادداشت</label>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">متن یادداشت</label>
               <textarea
                 rows={6}
                 value={editingNote.content}
                 onChange={(e) => setEditingNote({ ...editingNote, content: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-purple-500 resize-none font-sans leading-relaxed transition"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-purple-500 resize-none font-sans leading-relaxed transition shadow-2xs"
               />
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setEditingNote(null)}
-                className="h-11 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium border border-slate-700 transition cursor-pointer"
+                className="h-11 px-5 rounded-xl bg-white hover:bg-purple-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-purple-700 dark:hover:text-white text-xs font-medium border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-2xs"
               >
                 انصراف
               </button>

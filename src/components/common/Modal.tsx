@@ -78,10 +78,10 @@ export const Modal: React.FC<ModalProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: position === 'bottom' ? 30 : 15, scale: 0.98 }}
             transition={{ duration: 0.22, ease: 'easeOut' }}
-            className={`relative w-full ${maxWidthClasses} bg-slate-900 shadow-2xl overflow-hidden z-10 flex flex-col my-auto ${
+            className={`relative w-full ${maxWidthClasses} bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 shadow-2xl overflow-hidden z-10 flex flex-col my-auto ${
               position === 'bottom'
-                ? 'border-t sm:border border-slate-800 rounded-t-3xl sm:rounded-2xl'
-                : 'border border-slate-800/90 rounded-2xl sm:rounded-3xl'
+                ? 'border-t sm:border border-slate-200 dark:border-slate-800 rounded-t-3xl sm:rounded-2xl'
+                : 'border border-slate-200 dark:border-slate-800/90 rounded-2xl sm:rounded-3xl'
             }`}
             style={{
               maxHeight: 'calc(100dvh - var(--safe-top) - var(--safe-bottom) - 1rem)',
@@ -92,27 +92,27 @@ export const Modal: React.FC<ModalProps> = ({
             {/* Mobile Sheet Drag Indicator (only for bottom mode) */}
             {position === 'bottom' && (
               <div className="pt-2.5 pb-1 flex justify-center sm:hidden shrink-0">
-                <div className="w-10 h-1 rounded-full bg-slate-700/80" />
+                <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700/80" />
               </div>
             )}
 
             {/* Header */}
-            <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-5 border-b border-slate-800 bg-slate-900/90 flex-shrink-0">
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-5 border-b border-slate-100 dark:border-slate-800 bg-white/95 dark:bg-slate-900/90 flex-shrink-0">
               <div className="flex items-center gap-2.5 sm:gap-3">
                 {icon && (
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-purple-950/60 border border-purple-800/40 flex items-center justify-center text-purple-400 flex-shrink-0">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800/40 flex items-center justify-center text-purple-600 dark:text-purple-400 flex-shrink-0">
                     {icon}
                   </div>
                 )}
                 <div>
-                  <h3 className="text-sm sm:text-lg font-bold text-slate-100">{title}</h3>
-                  {subtitle && <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5 line-clamp-1">{subtitle}</p>}
+                  <h3 className="text-sm sm:text-lg font-bold text-slate-900 dark:text-slate-100">{title}</h3>
+                  {subtitle && <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">{subtitle}</p>}
                 </div>
               </div>
               <button
                 type="button"
                 onClick={onClose}
-                className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition cursor-pointer flex-shrink-0 active:scale-95"
+                className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer flex-shrink-0 active:scale-95"
                 title="بستن"
               >
                 <X className="w-4 h-4 sm:w-5 sm:h-5" />

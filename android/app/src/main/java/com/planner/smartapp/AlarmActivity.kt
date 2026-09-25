@@ -2,8 +2,10 @@ package com.planner.smartapp
 
 import android.app.Activity
 import android.app.KeyguardManager
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -20,6 +22,23 @@ import java.util.Locale
 
 class AlarmActivity : Activity() {
 
+    companion object {
+        private var instance: AlarmActivity? = null
+
+        fun dismissIfOpen() {
+            Handler(Looper.getMainLooper()).post {
+                instance?.let { act ->
+                    try {
+                        act.finish()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                    instance = null
+                }
+            }
+        }
+    }
+
     private var alarmId: String = ""
     private var title: String = ""
     private var message: String = ""
@@ -34,8 +53,35 @@ class AlarmActivity : Activity() {
         }
     }
 
+    private var stopReceiverRegistered = false
+    private val stopReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            finish()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // If alarm was already stopped from notification, immediately dismiss
+        if (!AlarmSoundService.isRinging) {
+            finish()
+            return
+        }
+
+        instance = this
+
+        try {
+            val filter = IntentFilter(AlarmSoundService.ACTION_STOP_ALARM)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                registerReceiver(stopReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+            } else {
+                registerReceiver(stopReceiver, filter)
+            }
+            stopReceiverRegistered = true
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
         // Lockscreen and Wake Screen Flags
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
@@ -86,23 +132,22 @@ class AlarmActivity : Activity() {
 
         stopButton.setOnClickListener {
             AlarmSoundService.stopAlarm(this)
-            // Open main app with the target item view
+            // Return user to their existing place in the app without recreating or resetting MainActivity
             val mainIntent = Intent(this, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                putExtra("targetView", targetView)
+                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
             startActivity(mainIntent)
-            finishAndRemoveTask()
+            finish()
         }
 
         snooze5Button.setOnClickListener {
             AlarmSoundService.snoozeAlarm(this, 5)
-            finishAndRemoveTask()
+            finish()
         }
 
         snooze10Button.setOnClickListener {
             AlarmSoundService.snoozeAlarm(this, 10)
-            finishAndRemoveTask()
+            finish()
         }
 
         updateClockDisplay()
@@ -115,8 +160,26 @@ class AlarmActivity : Activity() {
         clockView.text = sdf.format(Date())
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (!AlarmSoundService.isRinging) {
+            finish()
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        if (instance == this) {
+            instance = null
+        }
+        if (stopReceiverRegistered) {
+            try {
+                unregisterReceiver(stopReceiver)
+                stopReceiverRegistered = false
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
         timeHandler.removeCallbacks(timeRunnable)
     }
 

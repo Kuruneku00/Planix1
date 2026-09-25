@@ -312,9 +312,37 @@ html.light .bg-slate-800\/70,
 html.light .bg-slate-800\/60,
 html.light .bg-slate-800\/50,
 html.light .bg-slate-800\/40,
-html.light .bg-slate-850 {
+html.light .bg-slate-850,
+html.light .bg-slate-700,
+html.light .bg-slate-700\/90,
+html.light .bg-slate-700\/80,
+html.light .bg-slate-700\/70,
+html.light .bg-slate-700\/60,
+html.light .bg-slate-700\/50,
+html.light .bg-slate-700\/40,
+html.light .bg-slate-950\/70:not(.fixed),
+html.light .bg-slate-950\/60:not(.fixed),
+html.light .bg-slate-950\/50:not(.fixed),
+html.light .bg-slate-950\/40:not(.fixed),
+html.light .bg-slate-950\/30:not(.fixed),
+html.light .bg-slate-950\/20:not(.fixed),
+html.light .bg-slate-950:not(header):not(aside):not(.fixed):not([class*="inset-0"]) {
   background-color: #F1F4F9 !important;
-  border-color: #E8EDF5 !important;
+  border-color: #E2E8F0 !important;
+}
+
+/* Light Mode Secondary & Nudge Buttons (e.g. -, + buttons, secondary action pills) */
+html.light button.bg-slate-700,
+html.light button.bg-slate-800:not([class*="bg-purple"]):not([class*="bg-indigo"]):not([class*="bg-emerald"]):not([class*="bg-rose"]) {
+  background-color: #F1F4F9 !important;
+  color: #1E293B !important;
+  border-color: #E2E8F0 !important;
+}
+
+html.light button.bg-slate-700:hover,
+html.light button.bg-slate-800:hover {
+  background-color: #E2E8F0 !important;
+  color: #0F172A !important;
 }
 
 /* Gradients on cards - reset to crisp clean white or soft surface in light mode */

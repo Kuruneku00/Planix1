@@ -396,8 +396,8 @@ export const QuickAddModal: React.FC = () => {
   ];
 
   const fieldInputClass =
-    'h-11 w-full px-3.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-purple-500 transition';
-  const labelClass = 'block text-xs font-semibold text-slate-300 mb-1.5';
+    'h-11 w-full px-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-purple-500 transition shadow-2xs';
+  const labelClass = 'block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5';
 
   return (
     <Modal
@@ -409,7 +409,7 @@ export const QuickAddModal: React.FC = () => {
     >
       <div className="space-y-5" dir="rtl">
         {/* Equal-sized Navigation Tabs on Desktop */}
-        <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 p-1 rounded-2xl bg-slate-800/40 border border-slate-800">
+        <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 p-1 rounded-2xl bg-purple-50/50 dark:bg-slate-800/40 border border-purple-100 dark:border-slate-800">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -421,7 +421,7 @@ export const QuickAddModal: React.FC = () => {
                 className={`flex items-center justify-center gap-1.5 py-2 px-1.5 rounded-xl text-xs font-medium transition cursor-pointer w-full text-center ${
                   isActive
                     ? 'bg-purple-600 text-white shadow-md shadow-purple-900/30'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-purple-700 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-slate-800/60'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5 flex-shrink-0" />
@@ -479,7 +479,7 @@ export const QuickAddModal: React.FC = () => {
                 value={taskDesc}
                 onChange={(e) => setTaskDesc(e.target.value)}
                 placeholder="توضیحات و جزئیات انجام وظیفه..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-purple-500 transition resize-none"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-purple-500 transition resize-none"
               />
             </div>
 
@@ -498,12 +498,12 @@ export const QuickAddModal: React.FC = () => {
                     }
                   }}
                   placeholder="افزودن زیروظیفه..."
-                  className="h-10 flex-1 px-3.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 text-xs focus:outline-none focus:border-purple-500"
+                  className="h-10 flex-1 px-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs focus:outline-none focus:border-purple-500"
                 />
                 <button
                   type="button"
                   onClick={handleAddSubtask}
-                  className="h-10 px-4 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold transition cursor-pointer flex items-center gap-1"
+                  className="h-10 px-4 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-700 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-white text-xs font-semibold transition cursor-pointer flex items-center gap-1"
                 >
                   <Plus className="w-4 h-4" />
                   <span>افزودن</span>
@@ -515,13 +515,13 @@ export const QuickAddModal: React.FC = () => {
                   {subtasks.map((st, idx) => (
                     <div
                       key={st.id}
-                      className="flex items-center justify-between p-2.5 rounded-xl bg-slate-800/60 border border-slate-700/60 text-xs text-slate-200"
+                      className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs text-slate-800 dark:text-slate-200"
                     >
                       <span>{st.title}</span>
                       <button
                         type="button"
                         onClick={() => setSubtasks(subtasks.filter((_, i) => i !== idx))}
-                        className="text-slate-500 hover:text-rose-400 p-1"
+                        className="text-slate-400 hover:text-rose-500 p-1"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -531,11 +531,11 @@ export const QuickAddModal: React.FC = () => {
               )}
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setQuickAddOpen(false)}
-                className="h-11 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium border border-slate-700 transition cursor-pointer"
+                className="h-11 px-5 rounded-xl bg-white hover:bg-purple-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-purple-700 dark:hover:text-white text-xs font-medium border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-2xs"
               >
                 انصراف
               </button>
@@ -599,14 +599,14 @@ export const QuickAddModal: React.FC = () => {
 
               <div>
                 <label className={labelClass}>رنگ رویداد</label>
-                <div className="h-11 px-3.5 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-between">
+                <div className="h-11 px-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
                   {['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899'].map((c) => (
                     <button
                       key={c}
                       type="button"
                       onClick={() => setEventColor(c)}
                       className={`w-6 h-6 rounded-full transition cursor-pointer ${
-                        eventColor === c ? 'ring-2 ring-white scale-110' : 'opacity-60 hover:opacity-100'
+                        eventColor === c ? 'ring-2 ring-purple-500 scale-110' : 'opacity-60 hover:opacity-100'
                       }`}
                       style={{ backgroundColor: c }}
                     />
@@ -622,15 +622,15 @@ export const QuickAddModal: React.FC = () => {
                 value={eventDesc}
                 onChange={(e) => setEventDesc(e.target.value)}
                 placeholder="یادداشت‌ها و نکات مربوط به رویداد..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-purple-500 transition resize-none"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-purple-500 transition resize-none"
               />
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setQuickAddOpen(false)}
-                className="h-11 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium border border-slate-700 transition cursor-pointer"
+                className="h-11 px-5 rounded-xl bg-white hover:bg-purple-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-purple-700 dark:hover:text-white text-xs font-medium border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-2xs"
               >
                 انصراف
               </button>
@@ -654,7 +654,7 @@ export const QuickAddModal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setPomoMinutes((prev) => Math.max(1, prev - 5))}
-                  className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-700 transition cursor-pointer"
+                  className="py-2 px-3 rounded-xl bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-slate-700 text-purple-700 dark:text-slate-300 font-bold text-xs border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-2xs"
                 >
                   -۵
                 </button>
@@ -668,12 +668,12 @@ export const QuickAddModal: React.FC = () => {
                     const v = parseInt(e.target.value, 10);
                     setPomoMinutes(isNaN(v) ? 0 : v);
                   }}
-                  className="w-24 text-center text-xl font-black text-slate-100 bg-slate-800 border border-purple-500/60 rounded-xl py-2 font-mono focus:outline-none"
+                  className="w-24 text-center text-xl font-black text-purple-700 dark:text-slate-100 bg-white dark:bg-slate-800 border border-purple-400 dark:border-purple-500/60 rounded-xl py-2 font-mono focus:outline-none shadow-2xs"
                 />
                 <button
                   type="button"
                   onClick={() => setPomoMinutes((prev) => Math.min(720, prev + 5))}
-                  className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-700 transition cursor-pointer"
+                  className="py-2 px-3 rounded-xl bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-slate-700 text-purple-700 dark:text-slate-300 font-bold text-xs border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-2xs"
                 >
                   +۵
                 </button>
@@ -685,8 +685,8 @@ export const QuickAddModal: React.FC = () => {
                       onClick={() => setPomoMinutes(mins)}
                       className={`px-2.5 py-1.5 rounded-lg text-xs font-bold border transition cursor-pointer ${
                         pomoMinutes === mins
-                          ? 'bg-purple-600 border-purple-500 text-white'
-                          : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200'
+                          ? 'bg-purple-600 border-purple-500 text-white shadow-xs'
+                          : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-400 hover:text-purple-700 dark:hover:text-slate-200 hover:bg-purple-50'
                       }`}
                     >
                       {settings.persianDigits ? toPersianDigits(mins) : mins} دقیقه
@@ -723,11 +723,11 @@ export const QuickAddModal: React.FC = () => {
               />
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setQuickAddOpen(false)}
-                className="h-11 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium border border-slate-700 transition cursor-pointer"
+                className="h-11 px-5 rounded-xl bg-white hover:bg-purple-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-purple-700 dark:hover:text-white text-xs font-medium border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-2xs"
               >
                 انصراف
               </button>
@@ -773,14 +773,14 @@ export const QuickAddModal: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
                 <label className={labelClass}>رنگ مشخصه پروژه</label>
-                <div className="h-11 px-3.5 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-between">
+                <div className="h-11 px-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
                   {['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899'].map((c) => (
                     <button
                       key={c}
                       type="button"
                       onClick={() => setProjectColor(c)}
                       className={`w-6 h-6 rounded-full transition cursor-pointer ${
-                        projectColor === c ? 'ring-2 ring-white scale-110' : 'opacity-60 hover:opacity-100'
+                        projectColor === c ? 'ring-2 ring-purple-500 scale-110' : 'opacity-60 hover:opacity-100'
                       }`}
                       style={{ backgroundColor: c }}
                     />
@@ -790,7 +790,7 @@ export const QuickAddModal: React.FC = () => {
 
               <div>
                 <label className={labelClass}>وضعیت اولیه</label>
-                <div className="h-11 px-3.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 text-xs flex items-center justify-between">
+                <div className="h-11 px-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs flex items-center justify-between">
                   <span>برنامه‌ریزی اولیه</span>
                   <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse" />
                 </div>
@@ -804,15 +804,15 @@ export const QuickAddModal: React.FC = () => {
                 value={projectDesc}
                 onChange={(e) => setProjectDesc(e.target.value)}
                 placeholder="شرح کوتاه درباره پروژه..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-purple-500 resize-none"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-purple-500 resize-none"
               />
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setQuickAddOpen(false)}
-                className="h-11 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium border border-slate-700 transition cursor-pointer"
+                className="h-11 px-5 rounded-xl bg-white hover:bg-purple-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-purple-700 dark:hover:text-white text-xs font-medium border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-2xs"
               >
                 انصراف
               </button>
@@ -866,7 +866,7 @@ export const QuickAddModal: React.FC = () => {
                 value={goalDesc}
                 onChange={(e) => setGoalDesc(e.target.value)}
                 placeholder="علت انتخاب هدف و نتیجه مورد انتظار..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-purple-500 resize-none"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-purple-500 resize-none"
               />
             </div>
 
@@ -885,12 +885,12 @@ export const QuickAddModal: React.FC = () => {
                     }
                   }}
                   placeholder="افزودن مرحله..."
-                  className="h-10 flex-1 px-3.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 text-xs focus:outline-none focus:border-purple-500"
+                  className="h-10 flex-1 px-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs focus:outline-none focus:border-purple-500"
                 />
                 <button
                   type="button"
                   onClick={handleAddMilestone}
-                  className="h-10 px-4 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold transition flex items-center gap-1"
+                  className="h-10 px-4 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-700 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-white text-xs font-semibold transition flex items-center gap-1 cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                   <span>افزودن</span>
@@ -902,13 +902,13 @@ export const QuickAddModal: React.FC = () => {
                   {goalMilestones.map((ms, idx) => (
                     <div
                       key={ms.id}
-                      className="flex items-center justify-between p-2.5 rounded-xl bg-slate-800/60 border border-slate-700/60 text-xs text-slate-200"
+                      className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-xs text-slate-800 dark:text-slate-200"
                     >
                       <span>{ms.title}</span>
                       <button
                         type="button"
                         onClick={() => setGoalMilestones(goalMilestones.filter((_, i) => i !== idx))}
-                        className="text-slate-500 hover:text-rose-400 p-1"
+                        className="text-slate-400 hover:text-rose-500 p-1 cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -918,11 +918,11 @@ export const QuickAddModal: React.FC = () => {
               )}
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setQuickAddOpen(false)}
-                className="h-11 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium border border-slate-700 transition cursor-pointer"
+                className="h-11 px-5 rounded-xl bg-white hover:bg-purple-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-purple-700 dark:hover:text-white text-xs font-medium border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-2xs"
               >
                 انصراف
               </button>
@@ -942,7 +942,7 @@ export const QuickAddModal: React.FC = () => {
           <form onSubmit={handleSubmitHabit} className="space-y-4" dir="rtl">
             {/* Habit Title */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              <label className={labelClass}>
                 عنوان عادت <span className="text-rose-400">*</span>
               </label>
               <input
@@ -954,8 +954,8 @@ export const QuickAddModal: React.FC = () => {
                   if (habitTitleError) setHabitTitleError('');
                 }}
                 placeholder="مثلاً: ۳۰ دقیقه ورزش و نرمش / خواندن کتاب / نوشیدن آب..."
-                className={`w-full h-11 px-3.5 rounded-xl border text-xs sm:text-sm text-slate-100 bg-slate-800 focus:outline-none transition ${
-                  habitTitleError ? 'border-rose-500 ring-1 ring-rose-500/50' : 'border-slate-700 focus:border-purple-500'
+                className={`w-full h-11 px-3.5 rounded-xl border text-xs sm:text-sm text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 focus:outline-none transition ${
+                  habitTitleError ? 'border-rose-500 ring-1 ring-rose-500/50' : 'border-slate-200 dark:border-slate-700 focus:border-purple-500'
                 }`}
               />
               {habitTitleError && <p className="text-[11px] text-rose-400 mt-1 font-medium">{habitTitleError}</p>}
@@ -963,13 +963,13 @@ export const QuickAddModal: React.FC = () => {
 
             {/* Description */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">توضیحات و انگیزه (اختیاری)</label>
+              <label className={labelClass}>توضیحات و انگیزه (اختیاری)</label>
               <input
                 type="text"
                 value={habitDesc}
                 onChange={(e) => setHabitDesc(e.target.value)}
                 placeholder="انگیزه یا یادداشت درباره نحوه انجام این عادت..."
-                className="w-full h-10 px-3.5 rounded-xl border border-slate-700 bg-slate-800 text-xs text-slate-100 focus:outline-none focus:border-purple-500"
+                className="w-full h-10 px-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-purple-500"
               />
             </div>
 
@@ -981,13 +981,13 @@ export const QuickAddModal: React.FC = () => {
             />
 
             {/* Numeric Priority Stepper */}
-            <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/80 space-y-2">
+            <div className="p-3.5 rounded-xl bg-purple-50/30 dark:bg-slate-800/60 border border-purple-100 dark:border-slate-700/80 space-y-2">
               <div className="flex items-center justify-between">
-                <label className="block text-xs font-semibold text-slate-200 flex items-center gap-1.5">
-                  <Hash className="w-3.5 h-3.5 text-purple-400" />
+                <label className="block text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                  <Hash className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                   <span>اولویت نمایش در لیست</span>
                 </label>
-                <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-purple-950/80 border border-purple-800/50 text-purple-300 font-bold">
+                <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/80 border border-purple-200 dark:border-purple-800/50 text-purple-700 dark:text-purple-300 font-bold">
                   اولویت {settings.persianDigits ? toPersianDigits(habitOrder || 1) : (habitOrder || 1)}
                   {habitOrder === 1 ? ' (بالاترین)' : ''}
                 </span>
@@ -997,7 +997,7 @@ export const QuickAddModal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setHabitOrder((prev) => Math.max(1, (Number(prev) || 1) - 1))}
-                  className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center justify-center transition cursor-pointer active:scale-95 shrink-0"
+                  className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center transition cursor-pointer active:scale-95 shrink-0 shadow-2xs"
                   title="کاهش عدد اولویت (اولویت بالاتر)"
                 >
                   <Minus className="w-4 h-4" />
@@ -1016,20 +1016,20 @@ export const QuickAddModal: React.FC = () => {
                       setHabitOrder(isNaN(val) ? 1 : Math.max(1, val));
                     }}
                     placeholder="1"
-                    className="w-full h-10 px-3 text-center rounded-xl border border-slate-700 bg-slate-900 text-sm font-bold text-purple-300 font-mono focus:outline-none focus:border-purple-500"
+                    className="w-full h-10 px-3 text-center rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-bold text-purple-700 dark:text-purple-300 font-mono focus:outline-none focus:border-purple-500 shadow-2xs"
                   />
                 </div>
 
                 <button
                   type="button"
                   onClick={() => setHabitOrder((prev) => (Number(prev) || 1) + 1)}
-                  className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center justify-center transition cursor-pointer active:scale-95 shrink-0"
+                  className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center transition cursor-pointer active:scale-95 shrink-0 shadow-2xs"
                   title="افزایش عدد اولویت"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
               </div>
-              <p className="text-[10px] text-slate-400 leading-relaxed">
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed">
                 عادت‌ها بر اساس عدد اولویت کمتر در بالای صفحه قرار می‌گیرند. عدد ۱ بالاترین اولویت است.
               </p>
             </div>
@@ -1037,28 +1037,28 @@ export const QuickAddModal: React.FC = () => {
             {/* Target Days with Quick Presets */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="block text-xs font-semibold text-slate-300">
+                <label className={labelClass}>
                   روزهای تکرار در هفته <span className="text-rose-400">*</span>
                 </label>
                 <div className="flex items-center gap-1.5 text-[11px]">
                   <button
                     type="button"
                     onClick={() => setHabitTargetDays([0, 1, 2, 3, 4, 5, 6])}
-                    className="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 cursor-pointer text-[10px]"
+                    className="px-2 py-0.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-slate-700 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-slate-700 cursor-pointer text-[10px] shadow-2xs"
                   >
                     همه روزها
                   </button>
                   <button
                     type="button"
                     onClick={() => setHabitTargetDays([0, 1, 2, 3, 4])}
-                    className="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer text-[10px]"
+                    className="px-2 py-0.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 cursor-pointer text-[10px] shadow-2xs"
                   >
                     روزهای کاری
                   </button>
                   <button
                     type="button"
                     onClick={() => setHabitTargetDays([5, 6])}
-                    className="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer text-[10px]"
+                    className="px-2 py-0.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 cursor-pointer text-[10px] shadow-2xs"
                   >
                     آخر هفته
                   </button>
@@ -1094,7 +1094,7 @@ export const QuickAddModal: React.FC = () => {
                       className={`h-10 rounded-xl text-xs font-bold transition cursor-pointer border flex flex-col items-center justify-center ${
                         isSelected
                           ? 'bg-purple-600 text-white border-purple-500 shadow-sm shadow-purple-950/40'
-                          : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'
+                          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:text-purple-700 dark:hover:text-slate-200 hover:border-purple-300'
                       }`}
                       title={item.name}
                     >
@@ -1103,14 +1103,14 @@ export const QuickAddModal: React.FC = () => {
                   );
                 })}
               </div>
-              <p className="text-[10px] text-slate-400 leading-relaxed">
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed">
                 عادت فقط در روزهای انتخاب شده موعد انجام خواهد داشت و عدم انجام در سایر روزها زنجیره استمرار را قطع نمی‌کند.
               </p>
             </div>
 
             {/* Color */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">رنگ نشانه</label>
+              <label className={labelClass}>رنگ نشانه</label>
               <div className="flex items-center gap-3">
                 {['#8b5cf6', '#10b981', '#f59e0b', '#3b82f6', '#ec4899', '#06b6d4'].map((c) => (
                   <button
@@ -1118,7 +1118,7 @@ export const QuickAddModal: React.FC = () => {
                     type="button"
                     onClick={() => setHabitColor(c)}
                     className={`w-7 h-7 rounded-full transition cursor-pointer flex items-center justify-center ${
-                      habitColor === c ? 'ring-2 ring-white scale-110' : 'opacity-60 hover:opacity-100'
+                      habitColor === c ? 'ring-2 ring-purple-500 scale-110' : 'opacity-60 hover:opacity-100'
                     }`}
                     style={{ backgroundColor: c }}
                   >
@@ -1129,11 +1129,11 @@ export const QuickAddModal: React.FC = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setQuickAddOpen(false)}
-                className="px-4 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition text-xs font-medium cursor-pointer"
+                className="px-4 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition text-xs font-medium cursor-pointer"
               >
                 انصراف
               </button>
@@ -1177,14 +1177,14 @@ export const QuickAddModal: React.FC = () => {
 
               <div>
                 <label className={labelClass}>رنگ پس‌زمینه کارت</label>
-                <div className="h-11 px-3.5 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-between">
+                <div className="h-11 px-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
                   {['#1e293b', '#2e1065', '#0f172a', '#1e1b4b', '#064e3b', '#7c2d12'].map((c) => (
                     <button
                       key={c}
                       type="button"
                       onClick={() => setNoteColor(c)}
-                      className={`w-6 h-6 rounded-full border border-slate-600 transition cursor-pointer ${
-                        noteColor === c ? 'ring-2 ring-white scale-110' : 'opacity-60 hover:opacity-100'
+                      className={`w-6 h-6 rounded-full border border-slate-300 dark:border-slate-600 transition cursor-pointer ${
+                        noteColor === c ? 'ring-2 ring-purple-500 scale-110' : 'opacity-60 hover:opacity-100'
                       }`}
                       style={{ backgroundColor: c }}
                     />
@@ -1200,15 +1200,15 @@ export const QuickAddModal: React.FC = () => {
                 value={noteContent}
                 onChange={(e) => setNoteContent(e.target.value)}
                 placeholder="ایده‌ها، نکات کلیدی، یادداشت‌های جلسه یا خلاصه کتاب..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-purple-500 resize-none"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-purple-500 resize-none"
               />
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setQuickAddOpen(false)}
-                className="h-11 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium border border-slate-700 transition cursor-pointer"
+                className="h-11 px-5 rounded-xl bg-white hover:bg-purple-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-purple-700 dark:hover:text-white text-xs font-medium border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-2xs"
               >
                 انصراف
               </button>
@@ -1273,11 +1273,11 @@ export const QuickAddModal: React.FC = () => {
               />
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setQuickAddOpen(false)}
-                className="h-11 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium border border-slate-700 transition cursor-pointer"
+                className="h-11 px-5 rounded-xl bg-white hover:bg-purple-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-purple-700 dark:hover:text-white text-xs font-medium border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-2xs"
               >
                 انصراف
               </button>

@@ -216,10 +216,10 @@ export const DailyPlannerView: React.FC = () => {
         {/* Left Column: Top 3 Priorities & Daily Notes */}
         <div className="space-y-6">
           {/* Top Priorities of the Day */}
-          <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-4">
-            <div className="flex items-center gap-2 pb-2 border-b border-slate-800">
+          <div className="p-5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 space-y-4 shadow-xs">
+            <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
               <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-              <h3 className="font-bold text-slate-100 text-sm">اولویت‌های اصلی امروز (Top Priorities)</h3>
+              <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">اولویت‌های اصلی امروز (Top Priorities)</h3>
             </div>
 
             <form onSubmit={handleAddTopPriority} className="flex gap-2">
@@ -228,7 +228,7 @@ export const DailyPlannerView: React.FC = () => {
                 value={newPriorityText}
                 onChange={(e) => setNewPriorityText(e.target.value)}
                 placeholder="مهم‌ترین کار امروز چیست؟"
-                className="flex-1 px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 text-xs focus:outline-none focus:border-purple-500"
+                className="flex-1 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs focus:outline-none focus:border-purple-500 shadow-2xs"
               />
               <button
                 type="submit"
@@ -240,27 +240,27 @@ export const DailyPlannerView: React.FC = () => {
 
             <div className="space-y-2">
               {!dailyPlan?.topPriorities || dailyPlan.topPriorities.length === 0 ? (
-                <p className="text-xs text-slate-500 text-center py-4 bg-slate-800/20 rounded-xl border border-slate-800/50">
+                <p className="text-xs text-slate-500 text-center py-4 bg-slate-50 dark:bg-slate-800/20 rounded-xl border border-slate-200 dark:border-slate-800/50">
                   هنوز اولویت اصلی برای امروز مشخص نکرده‌اید.
                 </p>
               ) : (
                 dailyPlan.topPriorities.map((p, idx) => (
                   <div
                     key={p.id}
-                    className="flex items-center justify-between p-3 rounded-xl bg-slate-800/60 border border-slate-700/50 text-xs group"
+                    className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/50 text-xs group"
                   >
                     <div
                       onClick={() => handleTogglePriority(p.id)}
                       className="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer"
                     >
-                      <button type="button" className="text-slate-400 hover:text-purple-400">
+                      <button type="button" className="text-slate-400 hover:text-purple-600 dark:hover:text-purple-400">
                         {p.completed ? (
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                         ) : (
                           <Circle className="w-4 h-4" />
                         )}
                       </button>
-                      <span className={`truncate ${p.completed ? 'line-through text-slate-500' : 'text-slate-200'}`}>
+                      <span className={`truncate ${p.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-200 font-medium'}`}>
                         {p.text}
                       </span>
                     </div>
@@ -268,7 +268,7 @@ export const DailyPlannerView: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleDeletePriority(p.id)}
-                      className="text-slate-500 hover:text-rose-400 p-1 opacity-0 group-hover:opacity-100 transition cursor-pointer"
+                      className="text-slate-400 hover:text-rose-500 p-1 opacity-0 group-hover:opacity-100 transition cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -279,19 +279,19 @@ export const DailyPlannerView: React.FC = () => {
           </div>
 
           {/* Daily Notes & Reflections */}
-          <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
-            <h3 className="font-bold text-slate-100 text-sm">یادداشت و بازتاب پایانی روز</h3>
+          <div className="p-5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 space-y-3 shadow-xs">
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">یادداشت و بازتاب پایانی روز</h3>
             <textarea
               rows={4}
               defaultValue={dailyPlan?.notes || ''}
               onChange={(e) => setDailyNoteText(e.target.value)}
               placeholder="دستاوردهای امروز، نکات یادگیری، قدردانی یا موانع..."
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 text-xs focus:outline-none focus:border-purple-500 resize-none"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs focus:outline-none focus:border-purple-500 resize-none shadow-2xs"
             />
             <button
               type="button"
               onClick={handleSaveNotes}
-              className="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition cursor-pointer"
+              className="w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold border border-slate-200 dark:border-slate-700 transition cursor-pointer"
             >
               ذخیره یادداشت روز
             </button>
@@ -299,18 +299,18 @@ export const DailyPlannerView: React.FC = () => {
         </div>
 
         {/* Right 2 Columns: Time-Blocking Schedule */}
-        <div className="lg:col-span-2 p-5 sm:p-6 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-6">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="lg:col-span-2 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 space-y-6 shadow-xs">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-purple-400" />
-              <h3 className="font-bold text-slate-100 text-base">جدول زمان‌بندی و بلوک‌های تمرکز</h3>
+              <Clock className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">جدول زمان‌بندی و بلوک‌های تمرکز</h3>
             </div>
           </div>
 
           {/* Add TimeBlock Form */}
           <form
             onSubmit={handleAddTimeBlock}
-            className="p-3.5 sm:p-4 rounded-xl bg-slate-800/40 border border-slate-800 flex flex-col md:flex-row items-stretch md:items-center gap-2.5"
+            className="p-3.5 sm:p-4 rounded-xl bg-purple-50/40 dark:bg-slate-800/40 border border-purple-100 dark:border-slate-800 flex flex-col md:flex-row items-stretch md:items-center gap-2.5"
           >
             <div className="flex-1 min-w-0">
               <input
@@ -319,13 +319,13 @@ export const DailyPlannerView: React.FC = () => {
                 value={newBlockTitle}
                 onChange={(e) => setNewBlockTitle(e.target.value)}
                 placeholder="عنوان فعالیت (مثلاً: برنامه‌نویسی ماژول...)"
-                className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 text-xs focus:outline-none focus:border-purple-500"
+                className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs focus:outline-none focus:border-purple-500 shadow-2xs"
               />
             </div>
 
-            <div className="flex items-center justify-between sm:justify-start gap-2 flex-shrink-0 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700">
+            <div className="flex items-center justify-between sm:justify-start gap-2 flex-shrink-0 bg-white dark:bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs">
               <div className="flex items-center gap-1.5">
-                <span className="text-[11px] text-slate-400 font-medium">از ساعت:</span>
+                <span className="text-[11px] text-slate-600 dark:text-slate-400 font-medium">از ساعت:</span>
                 <PersianTimePicker
                   compact
                   value={newBlockStart}
@@ -333,7 +333,7 @@ export const DailyPlannerView: React.FC = () => {
                 />
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-[11px] text-slate-400 font-medium">تا:</span>
+                <span className="text-[11px] text-slate-600 dark:text-slate-400 font-medium">تا:</span>
                 <PersianTimePicker
                   compact
                   value={newBlockEnd}
@@ -344,7 +344,7 @@ export const DailyPlannerView: React.FC = () => {
 
             <button
               type="submit"
-              className="py-2 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-1.5 flex-shrink-0 whitespace-nowrap shadow-sm shadow-purple-950/50 active:scale-98"
+              className="py-2 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-1.5 flex-shrink-0 whitespace-nowrap shadow-sm shadow-purple-950/20 dark:shadow-purple-950/50 active:scale-98"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>افزودن بلوک</span>

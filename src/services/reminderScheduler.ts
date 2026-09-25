@@ -254,20 +254,29 @@ class ReminderScheduler {
   }
 
   public triggerAlarm(alarm: TriggeredAlarm) {
-    // 1. Play continuous synthesized audio alarm ring & vibrate device (phone-like loop until user stops/snoozes)
+    // 1. Notify UI subscribers (ActiveAlarmBanner)
+    this.listeners.forEach((cb) => {
+      try {
+        cb(alarm);
+      } catch (err) {
+        console.error('[ReminderScheduler] Listener callback error:', err);
+      }
+    });
+
+    // 2. Play continuous synthesized audio alarm ring & vibrate device (phone-like loop until user stops/snoozes)
     soundEffects.startContinuousAlarm();
 
-    // 2. Hardware vibration if supported on mobile device
+    // 3. Hardware vibration if supported on mobile device
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       try {
         navigator.vibrate([400, 200, 400, 200, 600]);
       } catch {}
     }
 
-    // 3. Trigger Native Android Alarm Sound Service (plays in USAGE_ALARM, audible even in Silent mode!)
+    // 4. Trigger Native Android Alarm Sound Service (plays in USAGE_ALARM, audible even in Silent mode!)
     nativeBridge.triggerImmediateAlarm(alarm.title, alarm.subtitle, alarm.targetView);
 
-    // 4. Deliver Real System Notification via NotificationService directly to phone
+    // 5. Deliver Real System Notification via NotificationService directly to phone
     if (typeof window !== 'undefined') {
       import('./notificationService').then(({ notificationService }) => {
         const notifType =
@@ -300,6 +309,9 @@ class ReminderScheduler {
   public stopAlarm() {
     soundEffects.stopContinuousAlarm();
     nativeBridge.stopActiveAlarm();
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('planner_alarm_stopped'));
+    }
   }
 
   /**

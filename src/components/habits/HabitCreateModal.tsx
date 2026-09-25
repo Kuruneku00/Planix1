@@ -93,7 +93,7 @@ export const HabitCreateModal: React.FC<HabitCreateModalProps> = ({
       <form onSubmit={handleSaveForm} className="space-y-4" dir="rtl">
         {/* Habit Title */}
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
             عنوان عادت <span className="text-rose-400">*</span>
           </label>
           <input
@@ -105,8 +105,8 @@ export const HabitCreateModal: React.FC<HabitCreateModalProps> = ({
               if (formError) setFormError('');
             }}
             placeholder="مثلاً: ۳۰ دقیقه ورزش و نرمش / خواندن کتاب / نوشیدن آب..."
-            className={`w-full h-11 px-3.5 rounded-xl border text-xs sm:text-sm text-slate-100 bg-slate-800 focus:outline-none transition ${
-              formError ? 'border-rose-500 ring-1 ring-rose-500/50' : 'border-slate-700 focus:border-purple-500'
+            className={`w-full h-11 px-3.5 rounded-xl border text-xs sm:text-sm text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 focus:outline-none transition ${
+              formError ? 'border-rose-500 ring-1 ring-rose-500/50' : 'border-slate-200 dark:border-slate-700 focus:border-purple-500 focus:bg-white'
             }`}
           />
           {formError && <p className="text-[11px] text-rose-400 mt-1 font-medium">{formError}</p>}
@@ -114,13 +114,13 @@ export const HabitCreateModal: React.FC<HabitCreateModalProps> = ({
 
         {/* Description */}
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5">توضیحات و انگیزه (اختیاری)</label>
+          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">توضیحات و انگیزه (اختیاری)</label>
           <input
             type="text"
             value={formDesc}
             onChange={(e) => setFormDesc(e.target.value)}
             placeholder="انگیزه یا یادداشت درباره نحوه انجام این عادت..."
-            className="w-full h-10 px-3.5 rounded-xl border border-slate-700 bg-slate-800 text-xs text-slate-100 focus:outline-none focus:border-purple-500"
+            className="w-full h-10 px-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-purple-500"
           />
         </div>
 
@@ -132,13 +132,13 @@ export const HabitCreateModal: React.FC<HabitCreateModalProps> = ({
         />
 
         {/* Numeric Priority Stepper */}
-        <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/80 space-y-2">
+        <div className="p-3.5 rounded-xl bg-purple-50/30 dark:bg-slate-800/60 border border-purple-100 dark:border-slate-700/80 space-y-2">
           <div className="flex items-center justify-between">
-            <label className="block text-xs font-semibold text-slate-200 flex items-center gap-1.5">
-              <Hash className="w-3.5 h-3.5 text-purple-400" />
+            <label className="block text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+              <Hash className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
               <span>اولویت نمایش در لیست</span>
             </label>
-            <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-purple-950/80 border border-purple-800/50 text-purple-300 font-bold">
+            <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/80 border border-purple-200 dark:border-purple-800/50 text-purple-700 dark:text-purple-300 font-bold">
               اولویت {settings.persianDigits ? toPersianDigits(formPriority || 1) : (formPriority || 1)}
               {formPriority === 1 ? ' (بالاترین)' : ''}
             </span>
@@ -148,7 +148,7 @@ export const HabitCreateModal: React.FC<HabitCreateModalProps> = ({
             <button
               type="button"
               onClick={() => setFormPriority((prev) => Math.max(1, (Number(prev) || 1) - 1))}
-              className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center justify-center transition cursor-pointer active:scale-95 shrink-0"
+              className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center transition cursor-pointer active:scale-95 shrink-0 shadow-2xs"
               title="کاهش عدد اولویت (اولویت بالاتر)"
             >
               <Minus className="w-4 h-4" />
@@ -167,20 +167,20 @@ export const HabitCreateModal: React.FC<HabitCreateModalProps> = ({
                   setFormPriority(isNaN(val) ? ('' as any) : Math.max(1, val));
                 }}
                 placeholder="1"
-                className="w-full h-10 px-3 text-center rounded-xl border border-slate-700 bg-slate-900 text-sm font-bold text-purple-300 font-mono focus:outline-none focus:border-purple-500"
+                className="w-full h-10 px-3 text-center rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-bold text-purple-700 dark:text-purple-300 font-mono focus:outline-none focus:border-purple-500"
               />
             </div>
 
             <button
               type="button"
               onClick={() => setFormPriority((prev) => (Number(prev) || 1) + 1)}
-              className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center justify-center transition cursor-pointer active:scale-95 shrink-0"
+              className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center transition cursor-pointer active:scale-95 shrink-0 shadow-2xs"
               title="افزایش عدد اولویت"
             >
               <Plus className="w-4 h-4" />
             </button>
           </div>
-          <p className="text-[10px] text-slate-400 leading-relaxed">
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed">
             عادت‌ها بر اساس عدد اولویت کمتر در بالای صفحه قرار می‌گیرند. عدد ۱ بالاترین اولویت است.
           </p>
         </div>
@@ -188,28 +188,28 @@ export const HabitCreateModal: React.FC<HabitCreateModalProps> = ({
         {/* Target Days with Quick Presets */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="block text-xs font-semibold text-slate-300">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
               روزهای تکرار در هفته <span className="text-rose-400">*</span>
             </label>
             <div className="flex items-center gap-1.5 text-[11px]">
               <button
                 type="button"
                 onClick={() => setFormTargetDays([0, 1, 2, 3, 4, 5, 6])}
-                className="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 cursor-pointer text-[10px]"
+                className="px-2 py-0.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-slate-700 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-slate-700 cursor-pointer text-[10px] shadow-2xs"
               >
                 همه روزها
               </button>
               <button
                 type="button"
                 onClick={() => setFormTargetDays([0, 1, 2, 3, 4])}
-                className="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer text-[10px]"
+                className="px-2 py-0.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 cursor-pointer text-[10px] shadow-2xs"
               >
                 روزهای کاری
               </button>
               <button
                 type="button"
                 onClick={() => setFormTargetDays([5, 6])}
-                className="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer text-[10px]"
+                className="px-2 py-0.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 cursor-pointer text-[10px] shadow-2xs"
               >
                 آخر هفته
               </button>
@@ -245,7 +245,7 @@ export const HabitCreateModal: React.FC<HabitCreateModalProps> = ({
                   className={`h-10 rounded-xl text-xs font-bold transition cursor-pointer border flex flex-col items-center justify-center ${
                     isSelected
                       ? 'bg-purple-600 text-white border-purple-500 shadow-sm shadow-purple-950/40'
-                      : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'
+                      : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-purple-300 hover:text-purple-700 dark:hover:text-slate-200'
                   }`}
                   title={item.name}
                 >
@@ -254,21 +254,21 @@ export const HabitCreateModal: React.FC<HabitCreateModalProps> = ({
               );
             })}
           </div>
-          <p className="text-[10px] text-slate-400 leading-relaxed">
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed">
             عادت فقط در روزهای انتخاب شده موعد انجام خواهد داشت و عدم انجام در سایر روزها زنجیره استمرار را قطع نمی‌کند.
           </p>
         </div>
 
         {/* Optional Alarm / Reminder Toggle */}
-        <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/80 space-y-3">
+        <div className="p-3.5 rounded-xl bg-purple-50/30 dark:bg-slate-800/60 border border-purple-100 dark:border-slate-700/80 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Bell className={`w-4 h-4 ${formReminderEnabled ? 'text-purple-400' : 'text-slate-400'}`} />
+              <Bell className={`w-4 h-4 ${formReminderEnabled ? 'text-purple-600 dark:text-purple-400' : 'text-slate-400'}`} />
               <div>
-                <span className="text-xs font-semibold text-slate-200 block">
+                <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 block">
                   هشدار و آلارم روزانه (اختیاری)
                 </span>
-                <span className="text-[10px] text-slate-400">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400">
                   در صورت فعال بودن، در ساعت مشخص شده اعلان و زنگ پخش می‌شود
                 </span>
               </div>
@@ -278,7 +278,7 @@ export const HabitCreateModal: React.FC<HabitCreateModalProps> = ({
               type="button"
               onClick={() => setFormReminderEnabled(!formReminderEnabled)}
               className={`w-11 h-6 flex items-center rounded-full p-1 transition cursor-pointer ${
-                formReminderEnabled ? 'bg-purple-600 justify-end' : 'bg-slate-700 justify-start'
+                formReminderEnabled ? 'bg-purple-600 justify-end' : 'bg-slate-300 dark:bg-slate-700 justify-start'
               }`}
             >
               <div className="bg-white w-4 h-4 rounded-full shadow-md" />
@@ -286,8 +286,8 @@ export const HabitCreateModal: React.FC<HabitCreateModalProps> = ({
           </div>
 
           {formReminderEnabled && (
-            <div className="pt-2 border-t border-slate-700/60 animate-in fade-in duration-150">
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+            <div className="pt-2 border-t border-purple-100 dark:border-slate-700/60 animate-in fade-in duration-150">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                 ساعت پخش آلارم
               </label>
               <PersianTimePicker
@@ -300,7 +300,7 @@ export const HabitCreateModal: React.FC<HabitCreateModalProps> = ({
 
         {/* Color */}
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5">رنگ نشانه</label>
+          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">رنگ نشانه</label>
           <div className="flex items-center gap-3">
             {['#8b5cf6', '#10b981', '#f59e0b', '#3b82f6', '#ec4899', '#06b6d4'].map((c) => (
               <button
@@ -308,7 +308,7 @@ export const HabitCreateModal: React.FC<HabitCreateModalProps> = ({
                 type="button"
                 onClick={() => setFormColor(c)}
                 className={`w-7 h-7 rounded-full transition cursor-pointer flex items-center justify-center ${
-                  formColor === c ? 'ring-2 ring-white scale-110' : 'opacity-60 hover:opacity-100'
+                  formColor === c ? 'ring-2 ring-purple-500 scale-110' : 'opacity-60 hover:opacity-100'
                 }`}
                 style={{ backgroundColor: c }}
               >
@@ -319,17 +319,17 @@ export const HabitCreateModal: React.FC<HabitCreateModalProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+        <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition text-xs font-medium cursor-pointer"
+            className="px-4 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition text-xs font-medium cursor-pointer"
           >
             انصراف
           </button>
           <button
             type="submit"
-            className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition shadow-md shadow-purple-950/50 cursor-pointer active:scale-98"
+            className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition shadow-md shadow-purple-950/20 dark:shadow-purple-950/50 cursor-pointer active:scale-98"
           >
             ایجاد عادت
           </button>

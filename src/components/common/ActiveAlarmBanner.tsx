@@ -27,8 +27,14 @@ export const ActiveAlarmBanner: React.FC = () => {
       refreshDb();
     });
 
+    const handleAlarmStopped = () => {
+      setActiveAlarms([]);
+    };
+    window.addEventListener('planner_alarm_stopped', handleAlarmStopped);
+
     return () => {
       unsubscribe();
+      window.removeEventListener('planner_alarm_stopped', handleAlarmStopped);
     };
   }, [refreshDb]);
 
@@ -131,26 +137,26 @@ export const ActiveAlarmBanner: React.FC = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="pointer-events-auto bg-slate-900/98 border border-amber-500/70 rounded-xl p-3 shadow-xl backdrop-blur-md"
+              className="pointer-events-auto bg-white dark:bg-slate-900/98 border border-amber-500/70 rounded-xl p-3 shadow-xl backdrop-blur-md"
             >
               <div className="flex items-start gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-amber-950/80 border border-amber-500/50 text-amber-400 flex items-center justify-center shrink-0 animate-bounce mt-0.5">
+                <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-500/50 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 animate-bounce mt-0.5">
                   <BellRing className="w-4 h-4" />
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
-                    <h4 className="font-bold text-xs sm:text-sm text-slate-100 truncate">{alarm.title}</h4>
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800/60 shrink-0 font-bold">
+                    <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 truncate">{alarm.title}</h4>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60 shrink-0 font-bold">
                       {toPersianDigits(alarm.time)}
                     </span>
                   </div>
 
-                  <p className="text-[11px] text-slate-300 mt-0.5 leading-snug line-clamp-2">
+                  <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5 leading-snug line-clamp-2">
                     {alarm.subtitle}
                   </p>
 
-                  <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-800">
+                  <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                     <button
                       type="button"
                       onClick={() => handleStopAlarm(alarm.id)}
@@ -170,7 +176,7 @@ export const ActiveAlarmBanner: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleNavigate(alarm)}
-                      className="py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold border border-slate-700 transition cursor-pointer flex items-center justify-center gap-1"
+                      className="py-1.5 px-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[11px] font-semibold border border-slate-200 dark:border-slate-700 transition cursor-pointer flex items-center justify-center gap-1"
                       title="مشاهده جزئیات"
                     >
                       <ExternalLink className="w-3 h-3" />

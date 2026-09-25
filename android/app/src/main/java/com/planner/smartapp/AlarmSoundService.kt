@@ -35,6 +35,9 @@ class AlarmSoundService : Service() {
         const val ACTION_SNOOZE_ALARM = "com.planner.smartapp.ACTION_SNOOZE_ALARM"
         const val NOTIFICATION_ID = 998877
 
+        @Volatile
+        var isRinging: Boolean = false
+
         fun startAlarm(
             context: Context,
             id: String,
@@ -59,6 +62,20 @@ class AlarmSoundService : Service() {
         }
 
         fun stopAlarm(context: Context) {
+            isRinging = false
+            AlarmActivity.dismissIfOpen()
+            try {
+                val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+                nm?.cancel(NOTIFICATION_ID)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            try {
+                val broadcastIntent = Intent(ACTION_STOP_ALARM).setPackage(context.packageName)
+                context.sendBroadcast(broadcastIntent)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
             val intent = Intent(context, AlarmSoundService::class.java).apply {
                 action = ACTION_STOP_ALARM
             }
@@ -66,6 +83,8 @@ class AlarmSoundService : Service() {
         }
 
         fun snoozeAlarm(context: Context, minutes: Int = 5) {
+            isRinging = false
+            AlarmActivity.dismissIfOpen()
             val intent = Intent(context, AlarmSoundService::class.java).apply {
                 action = ACTION_SNOOZE_ALARM
                 putExtra("minutes", minutes)
@@ -191,8 +210,7 @@ class AlarmSoundService : Service() {
         )
 
         val contentIntent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            putExtra("targetView", currentTargetView)
+            flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
         val pendingContentIntent = PendingIntent.getActivity(
             this,
@@ -240,11 +258,13 @@ class AlarmSoundService : Service() {
             .setOngoing(true)
             .setAutoCancel(false)
             .setContentIntent(pendingContentIntent)
+            .setDeleteIntent(pendingStopIntent)
             .setFullScreenIntent(fullScreenPendingIntent, true)
             .addAction(android.R.drawable.ic_menu_close_clear_cancel, "توقف", pendingStopIntent)
             .addAction(android.R.drawable.ic_lock_idle_alarm, "تعویق (۵ دقیقه)", pendingSnoozeIntent)
             .build()
 
+        isRinging = true
         startForeground(NOTIFICATION_ID, notification)
 
         // Also launch AlarmActivity directly so it presents immediately
@@ -292,6 +312,15 @@ class AlarmSoundService : Service() {
     }
 
     private fun stopContinuousRinging() {
+        isRinging = false
+        AlarmActivity.dismissIfOpen()
+        try {
+            val broadcastIntent = Intent(ACTION_STOP_ALARM).setPackage(packageName)
+            sendBroadcast(broadcastIntent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
         try {
             mediaPlayer?.stop()
             mediaPlayer?.release()

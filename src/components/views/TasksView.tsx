@@ -192,12 +192,14 @@ export const TasksView: React.FC = () => {
 
         <div className="flex items-center justify-between sm:justify-end gap-2.5">
           {/* View Toggle */}
-          <div className="flex items-center bg-slate-900 border border-slate-800 p-1 rounded-xl">
+          <div className="flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1 rounded-xl shadow-2xs">
             <button
               type="button"
               onClick={() => setViewMode('list')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer ${
-                viewMode === 'list' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                viewMode === 'list'
+                  ? 'bg-purple-600 text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-purple-700 dark:hover:text-slate-200 hover:bg-purple-50 dark:hover:bg-slate-800'
               }`}
             >
               <List className="w-3.5 h-3.5" />
@@ -207,7 +209,9 @@ export const TasksView: React.FC = () => {
               type="button"
               onClick={() => setViewMode('board')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer ${
-                viewMode === 'board' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                viewMode === 'board'
+                  ? 'bg-purple-600 text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-purple-700 dark:hover:text-slate-200 hover:bg-purple-50 dark:hover:bg-slate-800'
               }`}
             >
               <Kanban className="w-3.5 h-3.5" />
@@ -227,7 +231,7 @@ export const TasksView: React.FC = () => {
       </div>
 
       {/* Filters Bar */}
-      <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5 sm:gap-3">
+      <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5 sm:gap-3 shadow-xs">
         {/* Search */}
         <div className="relative flex-1">
           <input
@@ -235,7 +239,7 @@ export const TasksView: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="جستجو در وظایف..."
-            className="w-full pl-3 pr-9 py-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 text-xs focus:outline-none focus:border-purple-500"
+            className="w-full pl-3 pr-9 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs focus:outline-none focus:border-purple-500 shadow-2xs"
           />
           <Search className="w-4 h-4 text-slate-400 absolute right-3 top-2.5" />
         </div>
@@ -331,10 +335,10 @@ export const TasksView: React.FC = () => {
               <div
                 key={task.id}
                 onClick={() => setSelectedTaskForDetail(task)}
-                className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl border transition group cursor-pointer ${
+                className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl border transition group cursor-pointer shadow-2xs ${
                   task.status === 'completed'
-                    ? 'bg-slate-900/40 border-slate-800/60 opacity-75'
-                    : 'bg-slate-900/90 border-slate-800 hover:border-purple-800/40'
+                    ? 'bg-slate-50 dark:bg-slate-900/40 border-slate-200/80 dark:border-slate-800/60 opacity-75'
+                    : 'bg-white dark:bg-slate-900/90 border-slate-200 dark:border-slate-800 hover:border-purple-300 dark:hover:border-purple-800/40'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2.5 sm:gap-3">
@@ -564,7 +568,7 @@ export const TasksView: React.FC = () => {
                   </h3>
                   <div className="flex flex-wrap items-center gap-2 mt-2">
                     <Badge priority={selectedTaskForDetail.priority} />
-                    <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-xs font-medium border border-slate-700">
+                    <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium border border-slate-200 dark:border-slate-700">
                       {selectedTaskForDetail.status === 'completed'
                         ? 'تکمیل شده'
                         : selectedTaskForDetail.status === 'in_progress'
@@ -572,7 +576,7 @@ export const TasksView: React.FC = () => {
                         : 'انجام نشده'}
                     </span>
                     {selectedTaskForDetail.projectId && (
-                      <span className="px-2 py-0.5 rounded-md bg-purple-950/60 text-purple-300 text-xs font-medium border border-purple-800/40">
+                      <span className="px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 text-xs font-medium border border-purple-200 dark:border-purple-800/40">
                         {allProjects.find((p) => p.id === selectedTaskForDetail.projectId)?.name || 'پروژه'}
                       </span>
                     )}
@@ -582,12 +586,12 @@ export const TasksView: React.FC = () => {
             </div>
 
             {selectedTaskForDetail.description && (
-              <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/50">
-                <div className="text-xs font-semibold text-slate-400 mb-1 flex items-center gap-1.5">
-                  <AlignRight className="w-3.5 h-3.5" />
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/50">
+                <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1.5">
+                  <AlignRight className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                   <span>توضیحات</span>
                 </div>
-                <p className="text-xs text-slate-200 leading-relaxed whitespace-pre-wrap">
+                <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-wrap">
                   {selectedTaskForDetail.description}
                 </p>
               </div>
@@ -595,10 +599,10 @@ export const TasksView: React.FC = () => {
 
             {/* Subtasks */}
             {selectedTaskForDetail.subtasks && selectedTaskForDetail.subtasks.length > 0 && (
-              <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/50 space-y-2.5">
-                <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/50 space-y-2.5">
+                <div className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300">
                   <span>زیروظایف و چک‌لیست:</span>
-                  <span>
+                  <span className="font-mono text-purple-600 dark:text-purple-400">
                     {selectedTaskForDetail.subtasks.filter((s) => s.completed).length} از{' '}
                     {selectedTaskForDetail.subtasks.length}
                   </span>
@@ -608,18 +612,18 @@ export const TasksView: React.FC = () => {
                     <div
                       key={st.id}
                       onClick={() => handleToggleSubtask(selectedTaskForDetail.id, st.id)}
-                      className="flex items-center gap-2.5 p-2 rounded-lg bg-slate-900/50 hover:bg-slate-900 border border-slate-800 transition cursor-pointer text-xs"
+                      className="flex items-center gap-2.5 p-2 rounded-lg bg-white dark:bg-slate-900/50 hover:bg-purple-50/50 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 transition cursor-pointer text-xs"
                     >
                       <div
                         className={`w-4 h-4 rounded border flex items-center justify-center ${
                           st.completed
                             ? 'bg-purple-600 border-purple-500 text-white'
-                            : 'border-slate-600'
+                            : 'border-slate-300 dark:border-slate-600'
                         }`}
                       >
                         {st.completed && <Check className="w-3 h-3" />}
                       </div>
-                      <span className={st.completed ? 'line-through text-slate-500' : 'text-slate-200'}>
+                      <span className={st.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-200'}>
                         {st.title}
                       </span>
                     </div>
@@ -629,22 +633,22 @@ export const TasksView: React.FC = () => {
             )}
 
             {/* Dates and Tags */}
-            <div className="grid grid-cols-2 gap-2 text-xs text-slate-300">
+            <div className="grid grid-cols-2 gap-2 text-xs text-slate-700 dark:text-slate-300">
               {selectedTaskForDetail.dueDate && (
-                <div className="p-2.5 rounded-xl bg-slate-800/40 border border-slate-800 flex items-center gap-2">
-                  <CalendarIcon className="w-4 h-4 text-purple-400" />
+                <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 flex items-center gap-2 shadow-2xs">
+                  <CalendarIcon className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                   <div>
                     <div className="text-[10px] text-slate-400">تاریخ سررسید</div>
-                    <div>{formatToJalali(selectedTaskForDetail.dueDate, 'date_only', settings.persianDigits)}</div>
+                    <div className="font-medium">{formatToJalali(selectedTaskForDetail.dueDate, 'date_only', settings.persianDigits)}</div>
                   </div>
                 </div>
               )}
               {selectedTaskForDetail.dueTime && (
-                <div className="p-2.5 rounded-xl bg-slate-800/40 border border-slate-800 flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-indigo-400" />
+                <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 flex items-center gap-2 shadow-2xs">
+                  <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                   <div>
                     <div className="text-[10px] text-slate-400">ساعت</div>
-                    <div className="font-mono">
+                    <div className="font-mono font-medium">
                       {settings.persianDigits
                         ? toPersianDigits(selectedTaskForDetail.dueTime)
                         : selectedTaskForDetail.dueTime}
@@ -659,7 +663,7 @@ export const TasksView: React.FC = () => {
                 {selectedTaskForDetail.tags.map((tag, idx) => (
                   <span
                     key={idx}
-                    className="text-xs px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-300"
+                    className="text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300"
                   >
                     #{tag}
                   </span>
@@ -718,7 +722,7 @@ export const TasksView: React.FC = () => {
         >
           <form onSubmit={handleUpdateTask} className="space-y-4" dir="rtl">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">عنوان وظیفه *</label>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">عنوان وظیفه *</label>
               <input
                 type="text"
                 value={editingTask.title}
@@ -726,9 +730,9 @@ export const TasksView: React.FC = () => {
                   setEditingTask({ ...editingTask, title: e.target.value });
                   if (editTitleError) setEditTitleError('');
                 }}
-                className={`h-11 w-full px-3.5 rounded-xl bg-slate-800 border ${
-                  editTitleError ? 'border-rose-500 focus:border-rose-500' : 'border-slate-700 focus:border-purple-500'
-                } text-slate-100 text-xs sm:text-sm focus:outline-none transition`}
+                className={`h-11 w-full px-3.5 rounded-xl bg-white dark:bg-slate-800 border ${
+                  editTitleError ? 'border-rose-500 focus:border-rose-500' : 'border-slate-200 dark:border-slate-700 focus:border-purple-500'
+                } text-slate-800 dark:text-slate-100 text-xs sm:text-sm focus:outline-none transition shadow-2xs`}
               />
               {editTitleError && (
                 <p className="text-xs text-rose-400 mt-1">{editTitleError}</p>
@@ -768,20 +772,20 @@ export const TasksView: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">توضیحات</label>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">توضیحات</label>
               <textarea
                 rows={3}
                 value={editingTask.description || ''}
                 onChange={(e) => setEditingTask({ ...editingTask, description: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-purple-500 transition resize-none"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-purple-500 transition resize-none shadow-2xs"
               />
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setEditingTask(null)}
-                className="h-11 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium border border-slate-700 transition cursor-pointer"
+                className="h-11 px-5 rounded-xl bg-white hover:bg-purple-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-purple-700 dark:hover:text-white text-xs font-medium border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-2xs"
               >
                 انصراف
               </button>

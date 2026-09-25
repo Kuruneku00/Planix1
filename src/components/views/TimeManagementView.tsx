@@ -162,17 +162,17 @@ export const TimeManagementView: React.FC = () => {
         /* Eisenhower Matrix 4 Quadrants */
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Q1: Do First (فوری و مهم) */}
-          <div className="p-5 rounded-2xl bg-rose-950/20 border border-rose-800/40 space-y-3 flex flex-col justify-between min-h-[280px]">
+          <div className="p-5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800/40 space-y-3 flex flex-col justify-between min-h-[280px] shadow-2xs">
             <div>
-              <div className="flex items-center justify-between pb-2 border-b border-rose-800/30">
+              <div className="flex items-center justify-between pb-2 border-b border-rose-200 dark:border-rose-800/30">
                 <div>
-                  <h3 className="font-bold text-rose-300 text-sm flex items-center gap-1.5">
+                  <h3 className="font-bold text-rose-700 dark:text-rose-300 text-sm flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
                     <span>ربع اول: انجام فوری (مهم و فوری)</span>
                   </h3>
-                  <p className="text-[11px] text-rose-400/80 mt-0.5">بحران‌ها، ضرب‌الاجل‌ها و فوریت‌ها</p>
+                  <p className="text-[11px] text-rose-600/80 dark:text-rose-400/80 mt-0.5">بحران‌ها، ضرب‌الاجل‌ها و فوریت‌ها</p>
                 </div>
-                <span className="text-xs font-bold font-mono text-rose-300">
+                <span className="text-xs font-bold font-mono text-rose-700 dark:text-rose-300">
                   {settings.persianDigits ? toPersianDigits(q1Tasks.length) : q1Tasks.length}
                 </span>
               </div>
@@ -185,9 +185,9 @@ export const TimeManagementView: React.FC = () => {
                     <div
                       key={t.id}
                       onClick={() => handleToggleTask(t.id)}
-                      className="p-2.5 rounded-xl bg-slate-900/80 border border-rose-900/40 text-xs text-slate-200 flex items-center gap-2 cursor-pointer hover:border-rose-700"
+                      className="p-2.5 rounded-xl bg-white dark:bg-slate-900/80 border border-rose-200 dark:border-rose-900/40 text-xs text-slate-800 dark:text-slate-200 flex items-center gap-2 cursor-pointer hover:border-rose-400 dark:hover:border-rose-700 shadow-2xs"
                     >
-                      <Circle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                      <Circle className="w-4 h-4 text-rose-500 dark:text-rose-400 flex-shrink-0" />
                       <span className="truncate">{t.title}</span>
                     </div>
                   ))
@@ -198,24 +198,24 @@ export const TimeManagementView: React.FC = () => {
             <button
               type="button"
               onClick={() => openQuickAdd('task')}
-              className="w-full py-1.5 rounded-xl bg-rose-950/60 hover:bg-rose-900/80 text-rose-200 text-xs font-medium border border-rose-800/50 transition cursor-pointer"
+              className="w-full py-2 rounded-xl bg-rose-100/80 hover:bg-rose-200/80 dark:bg-rose-950/60 dark:hover:bg-rose-900/80 text-rose-700 dark:text-rose-200 text-xs font-semibold border border-rose-300/80 dark:border-rose-800/50 transition cursor-pointer shadow-2xs"
             >
               + افزودن وظیفه فوری
             </button>
           </div>
 
           {/* Q2: Schedule (مهم و غیرفوری) - حیاتی‌ترین ربع رشد */}
-          <div className="p-5 rounded-2xl bg-indigo-950/20 border border-indigo-800/40 space-y-3 flex flex-col justify-between min-h-[280px]">
+          <div className="p-5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-800/40 space-y-3 flex flex-col justify-between min-h-[280px] shadow-2xs">
             <div>
-              <div className="flex items-center justify-between pb-2 border-b border-indigo-800/30">
+              <div className="flex items-center justify-between pb-2 border-b border-indigo-200 dark:border-indigo-800/30">
                 <div>
-                  <h3 className="font-bold text-indigo-300 text-sm flex items-center gap-1.5">
+                  <h3 className="font-bold text-indigo-700 dark:text-indigo-300 text-sm flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
                     <span>ربع دوم: برنامه‌ریزی استراتژیک (مهم و غیرفوری)</span>
                   </h3>
-                  <p className="text-[11px] text-indigo-400/80 mt-0.5">رشد، یادگیری، ورزش، اهداف بلندمدت</p>
+                  <p className="text-[11px] text-indigo-600/80 dark:text-indigo-400/80 mt-0.5">رشد، یادگیری، ورزش، اهداف بلندمدت</p>
                 </div>
-                <span className="text-xs font-bold font-mono text-indigo-300">
+                <span className="text-xs font-bold font-mono text-indigo-700 dark:text-indigo-300">
                   {settings.persianDigits ? toPersianDigits(q2Tasks.length) : q2Tasks.length}
                 </span>
               </div>
@@ -228,9 +228,9 @@ export const TimeManagementView: React.FC = () => {
                     <div
                       key={t.id}
                       onClick={() => handleToggleTask(t.id)}
-                      className="p-2.5 rounded-xl bg-slate-900/80 border border-indigo-900/40 text-xs text-slate-200 flex items-center gap-2 cursor-pointer hover:border-indigo-700"
+                      className="p-2.5 rounded-xl bg-white dark:bg-slate-900/80 border border-indigo-200 dark:border-indigo-900/40 text-xs text-slate-800 dark:text-slate-200 flex items-center gap-2 cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-700 shadow-2xs"
                     >
-                      <Circle className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+                      <Circle className="w-4 h-4 text-indigo-500 dark:text-indigo-400 flex-shrink-0" />
                       <span className="truncate">{t.title}</span>
                     </div>
                   ))
@@ -241,24 +241,24 @@ export const TimeManagementView: React.FC = () => {
             <button
               type="button"
               onClick={() => openQuickAdd('task')}
-              className="w-full py-1.5 rounded-xl bg-indigo-950/60 hover:bg-indigo-900/80 text-indigo-200 text-xs font-medium border border-indigo-800/50 transition cursor-pointer"
+              className="w-full py-2 rounded-xl bg-indigo-100/80 hover:bg-indigo-200/80 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/80 text-indigo-700 dark:text-indigo-200 text-xs font-semibold border border-indigo-300/80 dark:border-indigo-800/50 transition cursor-pointer shadow-2xs"
             >
               + افزودن به ربع دوم
             </button>
           </div>
 
           {/* Q3: Delegate (فوری و غیرمهم) */}
-          <div className="p-5 rounded-2xl bg-amber-950/20 border border-amber-800/40 space-y-3 flex flex-col justify-between min-h-[280px]">
+          <div className="p-5 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/40 space-y-3 flex flex-col justify-between min-h-[280px] shadow-2xs">
             <div>
-              <div className="flex items-center justify-between pb-2 border-b border-amber-800/30">
+              <div className="flex items-center justify-between pb-2 border-b border-amber-200 dark:border-amber-800/30">
                 <div>
-                  <h3 className="font-bold text-amber-300 text-sm flex items-center gap-1.5">
+                  <h3 className="font-bold text-amber-700 dark:text-amber-300 text-sm flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
                     <span>ربع سوم: واگذاری یا اقدام سریع (فوری و غیرمهم)</span>
                   </h3>
-                  <p className="text-[11px] text-amber-400/80 mt-0.5">وقفه‌ها، برخی تماس‌ها و درخواست‌های دیگران</p>
+                  <p className="text-[11px] text-amber-600/80 dark:text-amber-400/80 mt-0.5">وقفه‌ها، برخی تماس‌ها و درخواست‌های دیگران</p>
                 </div>
-                <span className="text-xs font-bold font-mono text-amber-300">
+                <span className="text-xs font-bold font-mono text-amber-700 dark:text-amber-300">
                   {settings.persianDigits ? toPersianDigits(q3Tasks.length) : q3Tasks.length}
                 </span>
               </div>
@@ -271,9 +271,9 @@ export const TimeManagementView: React.FC = () => {
                     <div
                       key={t.id}
                       onClick={() => handleToggleTask(t.id)}
-                      className="p-2.5 rounded-xl bg-slate-900/80 border border-amber-900/40 text-xs text-slate-200 flex items-center gap-2 cursor-pointer hover:border-amber-700"
+                      className="p-2.5 rounded-xl bg-white dark:bg-slate-900/80 border border-amber-200 dark:border-amber-900/40 text-xs text-slate-800 dark:text-slate-200 flex items-center gap-2 cursor-pointer hover:border-amber-400 dark:hover:border-amber-700 shadow-2xs"
                     >
-                      <Circle className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                      <Circle className="w-4 h-4 text-amber-500 dark:text-amber-400 flex-shrink-0" />
                       <span className="truncate">{t.title}</span>
                     </div>
                   ))
@@ -284,24 +284,24 @@ export const TimeManagementView: React.FC = () => {
             <button
               type="button"
               onClick={() => openQuickAdd('task')}
-              className="w-full py-1.5 rounded-xl bg-amber-950/60 hover:bg-amber-900/80 text-amber-200 text-xs font-medium border border-amber-800/50 transition cursor-pointer"
+              className="w-full py-2 rounded-xl bg-amber-100/80 hover:bg-amber-200/80 dark:bg-amber-950/60 dark:hover:bg-amber-900/80 text-amber-700 dark:text-amber-200 text-xs font-semibold border border-amber-300/80 dark:border-amber-800/50 transition cursor-pointer shadow-2xs"
             >
               + افزودن وظیفه
             </button>
           </div>
 
           {/* Q4: Eliminate (غیرمهم و غیرفوری) */}
-          <div className="p-5 rounded-2xl bg-slate-900/40 border border-slate-800 space-y-3 flex flex-col justify-between min-h-[280px]">
+          <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 space-y-3 flex flex-col justify-between min-h-[280px] shadow-2xs">
             <div>
-              <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
                 <div>
-                  <h3 className="font-bold text-slate-300 text-sm flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-slate-500" />
+                  <h3 className="font-bold text-slate-800 dark:text-slate-300 text-sm flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-slate-400 dark:bg-slate-500" />
                     <span>ربع چهارم: حذف یا به حداقل رساندن</span>
                   </h3>
-                  <p className="text-[11px] text-slate-400 mt-0.5">اتلاف وقت، وبگردی بی‌هدف و فعالیت‌های کم‌ارزش</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">اتلاف وقت، وبگردی بی‌هدف و فعالیت‌های کم‌ارزش</p>
                 </div>
-                <span className="text-xs font-bold font-mono text-slate-400">
+                <span className="text-xs font-bold font-mono text-slate-700 dark:text-slate-400">
                   {settings.persianDigits ? toPersianDigits(q4Tasks.length) : q4Tasks.length}
                 </span>
               </div>
@@ -314,9 +314,9 @@ export const TimeManagementView: React.FC = () => {
                     <div
                       key={t.id}
                       onClick={() => handleToggleTask(t.id)}
-                      className="p-2.5 rounded-xl bg-slate-800/60 border border-slate-700/40 text-xs text-slate-300 flex items-center gap-2 cursor-pointer hover:border-slate-600"
+                      className="p-2.5 rounded-xl bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/40 text-xs text-slate-800 dark:text-slate-300 flex items-center gap-2 cursor-pointer hover:border-purple-300 dark:hover:border-slate-600 shadow-2xs"
                     >
-                      <Circle className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                      <Circle className="w-4 h-4 text-slate-400 dark:text-slate-500 flex-shrink-0" />
                       <span className="truncate">{t.title}</span>
                     </div>
                   ))
@@ -327,7 +327,7 @@ export const TimeManagementView: React.FC = () => {
             <button
               type="button"
               onClick={() => openQuickAdd('task')}
-              className="w-full py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700 transition cursor-pointer"
+              className="w-full py-2 rounded-xl bg-purple-50 hover:bg-purple-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-purple-700 dark:text-slate-300 text-xs font-semibold border border-purple-200 dark:border-slate-700 transition cursor-pointer shadow-2xs"
             >
               + افزودن
             </button>

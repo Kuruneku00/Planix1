@@ -6,8 +6,10 @@ import {
   jalaliToGregorian,
   getJalaliMonthDays,
   toPersianDigits,
+  toEnglishDigits,
   formatToJalali,
   toGregorianIsoDate,
+  parseJalaliInput,
 } from '../../utils/jalali';
 import { Modal } from '../common/Modal';
 import { CalendarEvent, Task } from '../../types';
@@ -38,6 +40,10 @@ export const CalendarView: React.FC = () => {
   const [currentMonth, setCurrentMonth] = useState(jMonth);
   const [selectedDay, setSelectedDay] = useState<number>(jDay);
   const [selectedDateIso, setSelectedDateIso] = useState<string>(toGregorianIsoDate());
+
+  // Direct typing states for selecting days and dates
+  const [dayInputText, setDayInputText] = useState<string>(String(jDay));
+  const [dateJumpText, setDateJumpText] = useState<string>('');
 
   // Database events and tasks
   const allEvents = useMemo(() => db.getEvents(), [refreshTrigger]);
@@ -83,6 +89,7 @@ export const CalendarView: React.FC = () => {
     setCurrentYear(jYear);
     setCurrentMonth(jMonth);
     setSelectedDay(jDay);
+    setDayInputText(String(jDay));
     setSelectedDateIso(toGregorianIsoDate());
   };
 
@@ -97,9 +104,34 @@ export const CalendarView: React.FC = () => {
 
   const handleSelectDay = (day: number) => {
     setSelectedDay(day);
+    setDayInputText(String(day));
     const { gy, gm, gd } = jalaliToGregorian(currentYear, currentMonth, day);
     const iso = `${gy}-${String(gm).padStart(2, '0')}-${String(gd).padStart(2, '0')}`;
     setSelectedDateIso(iso);
+  };
+
+  const handleDayInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setDayInputText(val);
+    const clean = toEnglishDigits(val).trim();
+    const num = parseInt(clean, 10);
+    if (!isNaN(num) && num >= 1 && num <= daysInMonth) {
+      handleSelectDay(num);
+    }
+  };
+
+  const handleJumpToDate = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const parsed = parseJalaliInput(dateJumpText);
+    if (!parsed) {
+      showToast('لطفاً تاریخ معتبر شمسی (مثلاً ۱۴۰۳/۰۷/۱۵) وارد کنید.', 'error');
+      return;
+    }
+    setCurrentYear(parsed.jy);
+    setCurrentMonth(parsed.jm);
+    handleSelectDay(parsed.jd);
+    showToast(`انتقال به تاریخ ${parsed.jy}/${parsed.jm}/${parsed.jd}`, 'success');
+    setDateJumpText('');
   };
 
   // Events on selected day
@@ -148,35 +180,35 @@ export const CalendarView: React.FC = () => {
       {/* Header Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h2 className="text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2">
-            <CalendarIcon className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <CalendarIcon className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400" />
             <span>تقویم جامع خورشیدی</span>
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             مشاهده رویدادها، سررسیدها و برنامه‌ریزی ماهانه و روزانه
           </p>
         </div>
 
         <div className="flex items-center justify-between sm:justify-end gap-1.5 sm:gap-2">
           {/* Month & Year Selector */}
-          <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 p-1 rounded-xl">
+          <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1 rounded-xl shadow-xs">
             <button
               type="button"
               onClick={handlePrevMonth}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition cursor-pointer"
+              className="p-1 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
               title="ماه قبل"
             >
               <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
 
-            <span className="text-xs sm:text-sm font-bold text-slate-200 px-2 min-w-[110px] sm:min-w-[130px] text-center">
+            <span className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 px-2 min-w-[110px] sm:min-w-[130px] text-center">
               {monthNames[currentMonth - 1]} {settings.persianDigits ? toPersianDigits(currentYear) : currentYear}
             </span>
 
             <button
               type="button"
               onClick={handleNextMonth}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition cursor-pointer"
+              className="p-1 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
               title="ماه بعد"
             >
               <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -186,7 +218,7 @@ export const CalendarView: React.FC = () => {
           <button
             type="button"
             onClick={handleToday}
-            className="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-purple-950/60 hover:bg-purple-900 border border-purple-800/60 text-purple-300 text-xs font-semibold transition cursor-pointer"
+            className="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-purple-100 dark:bg-purple-950/60 hover:bg-purple-200 dark:hover:bg-purple-900 border border-purple-300 dark:border-purple-800/60 text-purple-700 dark:text-purple-300 text-xs font-semibold transition cursor-pointer"
           >
             امروز
           </button>
@@ -194,7 +226,7 @@ export const CalendarView: React.FC = () => {
           <button
             type="button"
             onClick={() => openQuickAdd('event')}
-            className="flex items-center gap-1 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium shadow-md shadow-purple-950/40 transition cursor-pointer active:scale-98"
+            className="flex items-center gap-1 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium shadow-md shadow-purple-950/20 transition cursor-pointer active:scale-98"
           >
             <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>رویداد</span>
@@ -202,16 +234,61 @@ export const CalendarView: React.FC = () => {
         </div>
       </div>
 
+      {/* Quick Day & Date Input Bar - امکان تایپ مستقیم شماره روز و پرش به تاریخ */}
+      <div className="p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+        {/* Direct Day Typing */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 shrink-0">
+            تایپ و انتخاب روز:
+          </span>
+          <div className="flex items-center gap-1.5">
+            <input
+              type="text"
+              inputMode="numeric"
+              value={dayInputText}
+              onChange={handleDayInputChange}
+              placeholder={`۱ تا ${daysInMonth}`}
+              className="w-16 sm:w-20 h-9 text-center text-xs sm:text-sm font-bold font-mono rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-purple-600 dark:text-purple-300 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/40"
+              title="تایپ شماره روز برای انتخاب آنی در تقویم"
+            />
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+              از {settings.persianDigits ? toPersianDigits(daysInMonth) : daysInMonth} روز این ماه
+            </span>
+          </div>
+        </div>
+
+        {/* Full Jalali Date Jump */}
+        <form onSubmit={handleJumpToDate} className="flex items-center gap-2">
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 shrink-0">
+            پرش به تاریخ:
+          </span>
+          <input
+            type="text"
+            value={dateJumpText}
+            onChange={(e) => setDateJumpText(e.target.value)}
+            placeholder="مثلاً: ۱۴۰۳/۰۷/۱۵"
+            className="w-32 sm:w-36 h-9 px-2.5 text-center text-xs font-mono rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-purple-500"
+          />
+          <button
+            type="submit"
+            disabled={!dateJumpText.trim()}
+            className="h-9 px-3.5 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white text-xs font-medium transition cursor-pointer shrink-0"
+          >
+            برو
+          </button>
+        </form>
+      </div>
+
       {/* Main Grid Layout: Calendar Matrix + Day Sidebar */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Calendar Month Grid */}
-        <div className="lg:col-span-2 p-3.5 sm:p-6 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 sm:space-y-4">
+        <div className="lg:col-span-2 p-3.5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 space-y-3 sm:space-y-4 shadow-xs">
           {/* Weekday headers */}
-          <div className="grid grid-cols-7 gap-1 text-center font-bold text-[11px] sm:text-xs text-slate-400 pb-2 border-b border-slate-800">
+          <div className="grid grid-cols-7 gap-1 text-center font-bold text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 pb-2 border-b border-slate-100 dark:border-slate-800">
             {weekDayNames.map((d, i) => (
               <div
                 key={d}
-                className={`py-1.5 sm:py-2 rounded-lg ${i === 6 ? 'text-rose-400' : 'text-slate-400'}`}
+                className={`py-1.5 sm:py-2 rounded-lg ${i === 6 ? 'text-rose-500' : 'text-slate-600 dark:text-slate-400'}`}
               >
                 {d}
               </div>
@@ -222,7 +299,7 @@ export const CalendarView: React.FC = () => {
           <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
             {/* Empty slots for offset */}
             {Array.from({ length: firstDayOffset }).map((_, idx) => (
-              <div key={`offset_${idx}`} className="h-12 sm:h-20 rounded-lg sm:rounded-xl bg-slate-900/20" />
+              <div key={`offset_${idx}`} className="h-12 sm:h-20 rounded-lg sm:rounded-xl bg-slate-50/60 dark:bg-slate-900/20" />
             ))}
 
             {/* Days of current month */}
@@ -249,20 +326,22 @@ export const CalendarView: React.FC = () => {
                   onClick={() => handleSelectDay(dayNum)}
                   className={`h-12 sm:h-20 p-1 sm:p-2 rounded-lg sm:rounded-xl border flex flex-col justify-between transition cursor-pointer relative overflow-hidden ${
                     isSelected
-                      ? 'bg-purple-950/70 border-purple-500 ring-1 ring-purple-500'
+                      ? 'bg-purple-100 dark:bg-purple-950/70 border-purple-500 ring-1 ring-purple-500'
                       : isToday
-                      ? 'bg-slate-800/90 border-purple-600/60'
-                      : 'bg-slate-800/40 border-slate-800 hover:bg-slate-800 hover:border-slate-700'
+                      ? 'bg-purple-50 dark:bg-slate-800/90 border-purple-400 dark:border-purple-600/60'
+                      : 'bg-slate-50/80 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span
                       className={`text-[11px] sm:text-xs font-bold font-mono ${
                         isToday
-                          ? 'w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] sm:text-xs'
+                          ? 'w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] sm:text-xs shadow-xs'
                           : isFriday
-                          ? 'text-rose-400'
-                          : 'text-slate-200'
+                          ? 'text-rose-500'
+                          : isSelected
+                          ? 'text-purple-700 dark:text-purple-300 font-extrabold'
+                          : 'text-slate-700 dark:text-slate-200'
                       }`}
                     >
                       {settings.persianDigits ? toPersianDigits(dayNum) : dayNum}
@@ -271,10 +350,10 @@ export const CalendarView: React.FC = () => {
                     {(dayEvents.length > 0 || dayTasks.length > 0) && (
                       <div className="flex items-center gap-0.5 sm:gap-1">
                         {dayEvents.length > 0 && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
                         )}
                         {dayTasks.length > 0 && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                         )}
                       </div>
                     )}
@@ -285,7 +364,7 @@ export const CalendarView: React.FC = () => {
                     {dayEvents.slice(0, 1).map((evt) => (
                       <div
                         key={evt.id}
-                        className="text-[10px] px-1 py-0.5 rounded truncate bg-purple-900/60 text-purple-200 border border-purple-700/30"
+                        className="text-[10px] px-1 py-0.5 rounded truncate bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-200 border border-purple-200 dark:border-purple-700/30 font-medium"
                       >
                         {evt.title}
                       </div>
@@ -293,7 +372,7 @@ export const CalendarView: React.FC = () => {
                     {dayTasks.slice(0, 1).map((tsk) => (
                       <div
                         key={tsk.id}
-                        className="text-[10px] px-1 py-0.5 rounded truncate bg-slate-700/60 text-slate-300"
+                        className="text-[10px] px-1 py-0.5 rounded truncate bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 font-medium"
                       >
                         ✓ {tsk.title}
                       </div>
@@ -306,14 +385,14 @@ export const CalendarView: React.FC = () => {
         </div>
 
         {/* Selected Day Agenda Sidebar */}
-        <div className="p-4 sm:p-6 rounded-2xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between space-y-4">
+        <div className="p-4 sm:p-6 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 flex flex-col justify-between space-y-4 shadow-xs">
           <div>
-            <div className="pb-3 mb-4 border-b border-slate-800 flex items-center justify-between">
+            <div className="pb-3 mb-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <div>
-                <h3 className="font-bold text-slate-100 text-sm">
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">
                   برنامه‌های روز {settings.persianDigits ? toPersianDigits(selectedDay) : selectedDay} {monthNames[currentMonth - 1]}
                 </h3>
-                <span className="text-[11px] text-slate-400 font-mono">
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                   {formatToJalali(selectedDateIso, 'full', settings.persianDigits)}
                 </span>
               </div>
@@ -321,7 +400,7 @@ export const CalendarView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => openQuickAdd('event')}
-                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-400 transition"
+                className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-purple-600 dark:text-purple-400 transition cursor-pointer"
                 title="افزودن رویداد به این روز"
               >
                 <Plus className="w-4 h-4" />
@@ -331,22 +410,22 @@ export const CalendarView: React.FC = () => {
             {/* Events List for Selected Day */}
             <div className="space-y-4 max-h-96 overflow-y-auto">
               <div>
-                <h4 className="text-xs font-semibold text-slate-400 mb-2 flex items-center gap-1.5">
-                  <CalendarIcon className="w-3.5 h-3.5 text-purple-400" />
+                <h4 className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-1.5">
+                  <CalendarIcon className="w-3.5 h-3.5 text-purple-500" />
                   <span>رویدادها و جلسات:</span>
                 </h4>
 
                 {selectedDayEvents.length === 0 ? (
-                  <p className="text-xs text-slate-500 py-2">هیچ رویدادی برای این روز ثبت نشده است.</p>
+                  <p className="text-xs text-slate-400 py-2">هیچ رویدادی برای این روز ثبت نشده است.</p>
                 ) : (
                   <div className="space-y-2">
                     {selectedDayEvents.map((ev) => (
                       <div
                         key={ev.id}
-                        className="p-3 rounded-xl bg-slate-800/60 border border-slate-700/50 space-y-1 group"
+                        className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/50 space-y-1 group"
                       >
                         <div className="flex items-center justify-between">
-                          <h5 className="font-bold text-slate-100 text-xs truncate">{ev.title}</h5>
+                          <h5 className="font-bold text-slate-800 dark:text-slate-100 text-xs truncate">{ev.title}</h5>
                           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
                             <button
                               type="button"
@@ -362,23 +441,23 @@ export const CalendarView: React.FC = () => {
                                 });
                                 showToast('رویداد به تقویم دستگاه ارسال شد.', 'success');
                               }}
-                              className="text-slate-400 hover:text-emerald-400 p-1 transition cursor-pointer"
+                              className="text-slate-400 hover:text-emerald-500 p-1 transition cursor-pointer"
                             >
                               <Share2 className="w-3 h-3" />
                             </button>
                             <button
                               type="button"
                               onClick={() => handleDeleteEvent(ev)}
-                              className="text-slate-500 hover:text-rose-400 p-1 transition cursor-pointer"
+                              className="text-slate-400 hover:text-rose-500 p-1 transition cursor-pointer"
                             >
                               <Trash2 className="w-3 h-3" />
                             </button>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-3 text-[10px] text-slate-400 font-mono">
+                        <div className="flex items-center gap-3 text-[10px] text-slate-500 dark:text-slate-400 font-mono">
                           <div className="flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-purple-400" />
+                            <Clock className="w-3 h-3 text-purple-500" />
                             <span>
                               {settings.persianDigits ? toPersianDigits(ev.startTime) : ev.startTime} تا{' '}
                               {settings.persianDigits ? toPersianDigits(ev.endTime) : ev.endTime}
@@ -386,7 +465,7 @@ export const CalendarView: React.FC = () => {
                           </div>
                           {ev.location && (
                             <div className="flex items-center gap-1 font-sans">
-                              <MapPin className="w-3 h-3 text-rose-400" />
+                              <MapPin className="w-3 h-3 text-rose-500" />
                               <span className="truncate">{ev.location}</span>
                             </div>
                           )}
@@ -399,13 +478,13 @@ export const CalendarView: React.FC = () => {
 
               {/* Tasks due on this day */}
               <div>
-                <h4 className="text-xs font-semibold text-slate-400 mb-2 flex items-center gap-1.5">
-                  <CheckSquare className="w-3.5 h-3.5 text-emerald-400" />
+                <h4 className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-1.5">
+                  <CheckSquare className="w-3.5 h-3.5 text-emerald-500" />
                   <span>وظایف با سررسید این روز:</span>
                 </h4>
 
                 {selectedDayTasks.length === 0 ? (
-                  <p className="text-xs text-slate-500 py-2">وظیفه‌ای برای این روز تنظیم نشده است.</p>
+                  <p className="text-xs text-slate-400 py-2">وظیفه‌ای برای این روز تنظیم نشده است.</p>
                 ) : (
                   <div className="space-y-1.5">
                     {selectedDayTasks.map((t) => (
@@ -414,14 +493,16 @@ export const CalendarView: React.FC = () => {
                         onClick={() => handleToggleTask(t)}
                         className={`p-2.5 rounded-xl border flex items-center justify-between text-xs cursor-pointer transition ${
                           t.status === 'completed'
-                            ? 'bg-slate-800/30 border-slate-800/40 text-slate-500 line-through'
-                            : 'bg-slate-800/60 border-slate-700/50 text-slate-200 hover:border-purple-800/50'
+                            ? 'bg-slate-100/50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-800/40 text-slate-400 dark:text-slate-500 line-through'
+                            : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-slate-200 hover:border-purple-300 dark:hover:border-purple-800/50'
                         }`}
                       >
                         <span className="truncate">{t.title}</span>
                         <span
                           className={`text-[9px] px-1.5 py-0.5 rounded font-sans ${
-                            t.status === 'completed' ? 'bg-emerald-950 text-emerald-300' : 'bg-slate-700 text-slate-300'
+                            t.status === 'completed'
+                              ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                              : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                           }`}
                         >
                           {t.status === 'completed' ? 'انجام شد' : 'در انتظار'}
@@ -437,7 +518,7 @@ export const CalendarView: React.FC = () => {
           <button
             type="button"
             onClick={() => openQuickAdd('task')}
-            className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-300 text-xs font-semibold border border-slate-700/60 transition cursor-pointer flex items-center justify-center gap-1.5"
+            className="w-full py-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/40 dark:hover:bg-purple-900/50 text-purple-700 dark:text-purple-300 text-xs font-semibold border border-purple-200 dark:border-purple-800/60 transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
           >
             <Plus className="w-4 h-4" />
             <span>افزودن وظیفه به این روز</span>

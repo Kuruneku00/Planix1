@@ -26,13 +26,13 @@ export const ConfirmationModal: React.FC = () => {
       icon={<AlertTriangle className={isDanger ? 'text-rose-400' : 'text-amber-400'} />}
     >
       <div className="space-y-4">
-        <p className="text-sm text-slate-300 leading-relaxed">{message}</p>
+        <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{message}</p>
 
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
           <button
             type="button"
             onClick={closeConfirm}
-            className="px-4 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition text-sm font-medium cursor-pointer"
+            className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-purple-50 dark:hover:bg-slate-800 transition text-sm font-medium cursor-pointer"
           >
             {cancelText}
           </button>

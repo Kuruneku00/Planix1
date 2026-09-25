@@ -69,10 +69,10 @@ export const TimeOfDaySelector: React.FC<TimeOfDaySelectorProps> = ({
     <div className="space-y-1.5" dir="rtl">
       {label && (
         <div className="flex items-center justify-between">
-          <label className="block text-xs font-semibold text-slate-300">
+          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
             {label} {required && <span className="text-rose-400">*</span>}
           </label>
-          <span className="text-[10px] text-purple-400 font-medium">
+          <span className="text-[10px] text-purple-600 dark:text-purple-400 font-bold">
             {TIME_OF_DAY_ITEMS.find((i) => i.id === value)?.label}
           </span>
         </div>
@@ -90,16 +90,16 @@ export const TimeOfDaySelector: React.FC<TimeOfDaySelectorProps> = ({
               onClick={() => onChange(item.id)}
               className={`p-2.5 rounded-xl border text-right transition cursor-pointer flex flex-col justify-between gap-1.5 active:scale-[0.98] ${
                 isSelected
-                  ? 'bg-purple-950/60 border-purple-500 shadow-lg shadow-purple-950/40 ring-1 ring-purple-500/50'
-                  : 'bg-slate-800/60 border-slate-700/80 hover:bg-slate-800 hover:border-slate-600'
+                  ? 'bg-purple-50 dark:bg-purple-950/60 border-purple-400 dark:border-purple-500 shadow-sm ring-1 ring-purple-400/40 dark:ring-purple-500/50'
+                  : 'bg-white dark:bg-slate-800/60 border-slate-200 dark:border-slate-700/80 hover:bg-purple-50/40 dark:hover:bg-slate-800 hover:border-purple-200 dark:hover:border-slate-600'
               }`}
             >
               <div className="flex items-center justify-between w-full">
                 <div
                   className={`w-7 h-7 rounded-lg flex items-center justify-center border transition ${
                     isSelected
-                      ? 'bg-purple-900/60 border-purple-400/50 text-purple-200'
-                      : 'bg-slate-800 border-slate-700 ' + item.iconColor
+                      ? 'bg-purple-100 dark:bg-purple-900/60 border-purple-300 dark:border-purple-400/50 text-purple-700 dark:text-purple-200'
+                      : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 ' + item.iconColor
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -109,7 +109,7 @@ export const TimeOfDaySelector: React.FC<TimeOfDaySelectorProps> = ({
                   className={`w-4 h-4 rounded-full flex items-center justify-center border transition ${
                     isSelected
                       ? 'bg-purple-600 border-purple-400 text-white'
-                      : 'border-slate-700 bg-slate-900/60'
+                      : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60'
                   }`}
                 >
                   {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
@@ -119,12 +119,12 @@ export const TimeOfDaySelector: React.FC<TimeOfDaySelectorProps> = ({
               <div>
                 <span
                   className={`text-xs font-bold block transition ${
-                    isSelected ? 'text-purple-100' : 'text-slate-200'
+                    isSelected ? 'text-purple-900 dark:text-purple-100' : 'text-slate-800 dark:text-slate-200'
                   }`}
                 >
                   {item.label}
                 </span>
-                <span className="text-[10px] text-slate-400 block line-clamp-1 mt-0.5">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 block line-clamp-1 mt-0.5">
                   {item.desc}
                 </span>
               </div>

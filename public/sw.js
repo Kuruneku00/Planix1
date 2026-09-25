@@ -142,10 +142,6 @@ self.addEventListener('notificationclick', (event) => {
       for (const client of clientList) {
         if ('focus' in client) {
           client.focus();
-          client.postMessage({
-            type: 'NAVIGATE_VIEW',
-            targetView: targetView
-          });
           return;
         }
       }

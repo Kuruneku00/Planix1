@@ -51,11 +51,11 @@ export const RemindersView: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
-            <Bell className="w-6 h-6 text-amber-400" />
+          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <Bell className="w-6 h-6 text-amber-500 dark:text-amber-400" />
             <span>یادآورها و هشدارها (Reminders)</span>
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             تنظیم هشدارهای موعد مقرر، پرداخت‌ها، تماس‌ها و رویدادهای مهم
           </p>
         </div>
@@ -63,7 +63,7 @@ export const RemindersView: React.FC = () => {
         <button
           type="button"
           onClick={() => openQuickAdd('reminder')}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium shadow-md shadow-purple-950/40 transition cursor-pointer active:scale-98"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium shadow-md shadow-purple-600/30 transition cursor-pointer active:scale-98"
         >
           <Plus className="w-4 h-4" />
           <span>یادآور جدید</span>
@@ -86,17 +86,17 @@ export const RemindersView: React.FC = () => {
               onClick={() => handleToggleReminder(rem.id)}
               className={`p-4 rounded-2xl border transition cursor-pointer flex items-center justify-between gap-4 group ${
                 rem.isCompleted
-                  ? 'bg-slate-900/40 border-slate-800/60 opacity-60'
-                  : 'bg-slate-900/90 border-slate-800 hover:border-purple-800/40'
+                  ? 'bg-slate-50 dark:bg-slate-900/40 border-slate-200/80 dark:border-slate-800/60 opacity-60'
+                  : 'bg-white dark:bg-slate-900/90 border-slate-200 dark:border-slate-800 hover:border-purple-300 dark:hover:border-purple-800/40 shadow-xs'
               }`}
             >
               <div className="flex items-center gap-3.5 min-w-0">
                 <button
                   type="button"
-                  className="text-slate-400 hover:text-purple-400 transition flex-shrink-0 cursor-pointer"
+                  className="text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition flex-shrink-0 cursor-pointer"
                 >
                   {rem.isCompleted ? (
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
                   ) : (
                     <Circle className="w-5 h-5" />
                   )}
@@ -105,22 +105,22 @@ export const RemindersView: React.FC = () => {
                 <div className="truncate">
                   <h3
                     className={`font-bold text-sm truncate ${
-                      rem.isCompleted ? 'line-through text-slate-500' : 'text-slate-100'
+                      rem.isCompleted ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-slate-100'
                     }`}
                   >
                     {rem.title}
                   </h3>
-                  <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
+                  <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-1">
                     <div className="flex items-center gap-1">
-                      <CalendarIcon className="w-3.5 h-3.5 text-purple-400" />
+                      <CalendarIcon className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                       <span>{formatToJalali(rem.date, 'date_only', settings.persianDigits)}</span>
                     </div>
-                    <div className="flex items-center gap-1 font-mono text-purple-300">
-                      <Clock className="w-3.5 h-3.5 text-indigo-400" />
+                    <div className="flex items-center gap-1 font-mono text-purple-700 dark:text-purple-300">
+                      <Clock className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
                       <span>{settings.persianDigits ? toPersianDigits(rem.time) : rem.time}</span>
                     </div>
                     {rem.type !== 'none' && (
-                      <div className="flex items-center gap-1 text-[11px] text-amber-400">
+                      <div className="flex items-center gap-1 text-[11px] text-amber-600 dark:text-amber-400">
                         <Repeat className="w-3 h-3" />
                         <span>{recurrenceLabels[rem.type]}</span>
                       </div>

@@ -9,8 +9,11 @@ import {
   getJalaliMonthDays,
   jalaliToGregorian,
   gregorianToJalali,
+  parseJalaliInput,
+  parseJalaliToGregorianIso,
+  formatJalaliNumeric,
 } from '../../utils/jalali';
-import { Calendar as CalendarIcon, Clock, ChevronRight, ChevronLeft, ChevronDown, Check, X } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, ChevronRight, ChevronLeft, ChevronDown, Check, X, ArrowLeft } from 'lucide-react';
 
 interface PersianDatePickerProps {
   value?: string; // Gregorian ISO: YYYY-MM-DD
@@ -27,7 +30,7 @@ export const PersianDatePicker: React.FC<PersianDatePickerProps> = ({
   value,
   onChange,
   label,
-  placeholder = 'انتخاب تاریخ شمسی...',
+  placeholder = 'انتخاب یا تایپ تاریخ شمسی...',
   required = false,
   error,
   className = '',
@@ -60,13 +63,23 @@ export const PersianDatePicker: React.FC<PersianDatePickerProps> = ({
     parsedCurrentJalali?.jm ?? todayJalali.jm
   );
 
-  // When value changes from outside, sync view if opened
+  // Direct typing state
+  const [typedInput, setTypedInput] = useState<string>('');
+  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [directDayInput, setDirectDayInput] = useState<string>('');
+
+  // When value changes from outside, sync view & input
   useEffect(() => {
     if (parsedCurrentJalali) {
       setViewYear(parsedCurrentJalali.jy);
       setViewMonth(parsedCurrentJalali.jm);
+      if (!isTyping) {
+        setTypedInput(formatJalaliNumeric(parsedCurrentJalali.jy, parsedCurrentJalali.jm, parsedCurrentJalali.jd));
+      }
+    } else if (!isTyping) {
+      setTypedInput('');
     }
-  }, [parsedCurrentJalali]);
+  }, [parsedCurrentJalali, isTyping]);
 
   // Close on outside click
   useEffect(() => {
@@ -118,7 +131,55 @@ export const PersianDatePicker: React.FC<PersianDatePickerProps> = ({
     const gDate = jalaliToGregorian(viewYear, viewMonth, day);
     const iso = `${gDate.gy}-${String(gDate.gm).padStart(2, '0')}-${String(gDate.gd).padStart(2, '0')}`;
     onChange(iso);
+    setTypedInput(formatJalaliNumeric(viewYear, viewMonth, day));
     setIsOpen(false);
+    setDirectDayInput('');
+  };
+
+  const handleDirectDaySubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const clean = toEnglishDigits(directDayInput).trim();
+    const dayNum = parseInt(clean, 10);
+    if (!isNaN(dayNum) && dayNum >= 1 && dayNum <= daysInMonth) {
+      selectJalaliDay(dayNum);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsTyping(true);
+    const text = e.target.value;
+    setTypedInput(text);
+    const iso = parseJalaliToGregorianIso(text);
+    if (iso) {
+      onChange(iso);
+      const parsed = parseJalaliInput(text);
+      if (parsed) {
+        setViewYear(parsed.jy);
+        setViewMonth(parsed.jm);
+      }
+    }
+  };
+
+  const handleInputBlur = () => {
+    setIsTyping(false);
+    if (!typedInput.trim()) {
+      onChange('');
+      return;
+    }
+    const iso = parseJalaliToGregorianIso(typedInput);
+    if (iso) {
+      onChange(iso);
+      const parsed = parseJalaliInput(typedInput);
+      if (parsed) {
+        setViewYear(parsed.jy);
+        setViewMonth(parsed.jm);
+        setTypedInput(formatJalaliNumeric(parsed.jy, parsed.jm, parsed.jd));
+      }
+    } else if (parsedCurrentJalali) {
+      setTypedInput(formatJalaliNumeric(parsedCurrentJalali.jy, parsedCurrentJalali.jm, parsedCurrentJalali.jd));
+    } else {
+      setTypedInput('');
+    }
   };
 
   const setToday = () => {
@@ -127,6 +188,7 @@ export const PersianDatePicker: React.FC<PersianDatePickerProps> = ({
     onChange(iso);
     setViewYear(todayJalali.jy);
     setViewMonth(todayJalali.jm);
+    setTypedInput(formatJalaliNumeric(todayJalali.jy, todayJalali.jm, todayJalali.jd));
     setIsOpen(false);
   };
 
@@ -138,6 +200,7 @@ export const PersianDatePicker: React.FC<PersianDatePickerProps> = ({
     const j = gregorianToJalali(d.getFullYear(), d.getMonth() + 1, d.getDate());
     setViewYear(j.jy);
     setViewMonth(j.jm);
+    setTypedInput(formatJalaliNumeric(j.jy, j.jm, j.jd));
     setIsOpen(false);
   };
 
@@ -146,44 +209,86 @@ export const PersianDatePicker: React.FC<PersianDatePickerProps> = ({
   return (
     <div className={`relative ${className}`} ref={containerRef} dir="rtl">
       {label && (
-        <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
           {label} {required && <span className="text-rose-400">*</span>}
         </label>
       )}
 
-      {/* Trigger Button */}
+      {/* Trigger & Direct Typing Input Container */}
       <div
-        onClick={() => !disabled && setIsOpen(!isOpen)}
-        className={`h-11 px-3.5 rounded-xl border flex items-center justify-between cursor-pointer transition select-none ${
+        className={`h-11 px-2.5 sm:px-3 rounded-xl border flex items-center justify-between transition ${
           disabled
-            ? 'bg-slate-900 border-slate-800 text-slate-500 cursor-not-allowed'
+            ? 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400 cursor-not-allowed'
             : error
-            ? 'bg-slate-800 border-rose-500/80 text-slate-100 hover:border-rose-400'
+            ? 'bg-white dark:bg-slate-800 border-rose-500/80 text-slate-800 dark:text-slate-100 ring-1 ring-rose-500/40'
             : isOpen
-            ? 'bg-slate-800 border-purple-500 text-slate-100 ring-1 ring-purple-500/50'
-            : 'bg-slate-800 border-slate-700 text-slate-100 hover:border-slate-600'
+            ? 'bg-white dark:bg-slate-800 border-purple-500 text-slate-800 dark:text-slate-100 ring-1 ring-purple-500/50'
+            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 hover:border-purple-400 dark:hover:border-slate-600'
         }`}
       >
-        <div className="flex items-center gap-2.5 min-w-0">
-          <CalendarIcon className="w-4 h-4 text-purple-400 shrink-0" />
-          <span className={`text-xs sm:text-sm truncate ${displayString ? 'font-medium text-slate-100' : 'text-slate-400'}`}>
-            {displayString || placeholder}
-          </span>
-        </div>
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          className="p-1 rounded text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/40 transition shrink-0 cursor-pointer"
+          title="مشاهده تقویم و انتخاب روز"
+        >
+          <CalendarIcon className="w-4 h-4" />
+        </button>
 
-        {value && !disabled && (
+        {/* Direct typing field for Jalali date */}
+        <input
+          type="text"
+          disabled={disabled}
+          value={typedInput}
+          onChange={handleInputChange}
+          onBlur={handleInputBlur}
+          onFocus={() => {
+            if (!isOpen) setIsOpen(true);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleInputBlur();
+              setIsOpen(false);
+            }
+          }}
+          placeholder={placeholder || 'مثلاً: ۱۴۰۳/۰۷/۱۵'}
+          className="flex-1 bg-transparent px-2 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none font-mono"
+        />
+
+        <div className="flex items-center gap-1 shrink-0">
+          {displayString && (
+            <span className="text-[10px] text-slate-400 font-sans hidden md:inline max-w-[110px] truncate">
+              {displayString}
+            </span>
+          )}
+
+          {value && !disabled && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange('');
+                setTypedInput('');
+              }}
+              className="p-1 rounded text-slate-400 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer"
+              title="پاک کردن تاریخ"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+
           <button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onChange('');
-            }}
-            className="p-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-700 transition"
-            title="پاک کردن تاریخ"
+            disabled={disabled}
+            onClick={() => !disabled && setIsOpen(!isOpen)}
+            className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition cursor-pointer"
+            title="تقویم"
           >
-            <X className="w-3.5 h-3.5" />
+            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
           </button>
-        )}
+        </div>
       </div>
 
       {error && <p className="text-[11px] text-rose-400 mt-1 font-medium">{error}</p>}
@@ -197,103 +302,131 @@ export const PersianDatePicker: React.FC<PersianDatePickerProps> = ({
             onClick={() => setIsOpen(false)}
           />
 
-          <div className="fixed inset-x-3 bottom-[calc(4.5rem+var(--safe-bottom))] sm:bottom-auto sm:inset-x-auto sm:absolute sm:right-0 sm:mt-1.5 w-auto sm:w-80 p-3.5 rounded-2xl bg-slate-900 border border-slate-700/90 shadow-2xl shadow-purple-950/50 text-slate-100 z-50 max-w-[95vw] mx-auto animate-in fade-in sm:zoom-in-95 duration-150">
-            {/* Calendar Header: Month & Year Nav */}
-          <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
-            <button
-              type="button"
-              onClick={handlePrevMonth}
-              className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white transition cursor-pointer"
-              title="ماه قبل"
+          <div className="fixed inset-x-3 bottom-[calc(4.5rem+var(--safe-bottom))] sm:bottom-auto sm:inset-x-auto sm:absolute sm:right-0 sm:mt-1.5 w-auto sm:w-84 p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/90 shadow-2xl shadow-purple-950/30 text-slate-800 dark:text-slate-100 z-50 max-w-[95vw] mx-auto animate-in fade-in sm:zoom-in-95 duration-150">
+            {/* Direct Day Typing Section */}
+            <form
+              onSubmit={handleDirectDaySubmit}
+              className="flex items-center gap-1.5 mb-2.5 p-1.5 rounded-xl bg-purple-50/50 dark:bg-slate-800/80 border border-purple-200/80 dark:border-slate-700/60 shadow-2xs"
             >
-              <ChevronRight className="w-4 h-4" />
-            </button>
+              <span className="text-[11px] font-semibold text-purple-900 dark:text-slate-300 shrink-0">
+                تایپ روز:
+              </span>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={directDayInput}
+                onChange={(e) => setDirectDayInput(e.target.value)}
+                placeholder={`۱ تا ${daysInMonth}`}
+                className="w-16 h-7 text-center text-xs font-mono font-bold rounded-lg bg-white dark:bg-slate-900 border border-purple-300 dark:border-slate-700 text-purple-700 dark:text-purple-300 focus:outline-none focus:border-purple-500 shadow-2xs"
+              />
+              <button
+                type="submit"
+                disabled={!directDayInput.trim()}
+                className="h-7 px-2.5 rounded-lg bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white text-[11px] font-medium transition cursor-pointer shadow-xs"
+              >
+                انتخاب روز
+              </button>
+              <span className="text-[10px] text-purple-700/70 dark:text-slate-400 mr-auto hidden sm:inline font-mono">
+                ماه {PERSIAN_MONTH_NAMES[viewMonth - 1]}
+              </span>
+            </form>
 
-            <div className="flex items-center gap-2 font-bold text-xs sm:text-sm text-purple-300">
-              <span>{PERSIAN_MONTH_NAMES[viewMonth - 1]}</span>
-              <span className="font-mono">{toPersianDigits(viewYear)}</span>
+            {/* Calendar Header: Month & Year Nav */}
+            <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-purple-100 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={handlePrevMonth}
+                className="p-1.5 rounded-lg hover:bg-purple-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-purple-700 dark:hover:text-white transition cursor-pointer"
+                title="ماه قبل"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+
+              <div className="flex items-center gap-2 font-bold text-xs sm:text-sm text-purple-700 dark:text-purple-300">
+                <span>{PERSIAN_MONTH_NAMES[viewMonth - 1]}</span>
+                <span className="font-mono">{toPersianDigits(viewYear)}</span>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleNextMonth}
+                className="p-1.5 rounded-lg hover:bg-purple-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-purple-700 dark:hover:text-white transition cursor-pointer"
+                title="ماه بعد"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
             </div>
 
-            <button
-              type="button"
-              onClick={handleNextMonth}
-              className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white transition cursor-pointer"
-              title="ماه بعد"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
+            {/* Quick Shortcuts */}
+            <div className="flex items-center gap-1.5 mb-2.5">
+              <button
+                type="button"
+                onClick={setToday}
+                className="flex-1 py-1 px-2 rounded-lg bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-slate-700 text-[11px] font-semibold transition cursor-pointer shadow-2xs"
+              >
+                امروز
+              </button>
+              <button
+                type="button"
+                onClick={setTomorrow}
+                className="flex-1 py-1 px-2 rounded-lg bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-slate-700 text-[11px] font-semibold transition cursor-pointer shadow-2xs"
+              >
+                فردا
+              </button>
+            </div>
+
+            {/* Weekday headers */}
+            <div className="grid grid-cols-7 gap-1 text-center mb-1 text-[10px] sm:text-xs font-semibold text-slate-400">
+              {PERSIAN_WEEKDAY_SHORT.map((day, idx) => (
+                <div key={idx} className={idx === 6 ? 'text-rose-400' : ''}>
+                  {day}
+                </div>
+              ))}
+            </div>
+
+            {/* Days Grid */}
+            <div className="grid grid-cols-7 gap-1 text-center">
+              {/* Blank padding days */}
+              {Array.from({ length: startWeekday }).map((_, i) => (
+                <div key={`empty_${i}`} className="h-8" />
+              ))}
+
+              {/* Days of Month */}
+              {Array.from({ length: daysInMonth }).map((_, i) => {
+                const dayNum = i + 1;
+                const isSelected =
+                  parsedCurrentJalali?.jy === viewYear &&
+                  parsedCurrentJalali?.jm === viewMonth &&
+                  parsedCurrentJalali?.jd === dayNum;
+                const isToday =
+                  todayJalali.jy === viewYear &&
+                  todayJalali.jm === viewMonth &&
+                  todayJalali.jd === dayNum;
+                const weekdayIndex = (startWeekday + i) % 7;
+                const isFriday = weekdayIndex === 6;
+
+                return (
+                  <button
+                    key={`day_${dayNum}`}
+                    type="button"
+                    onClick={() => selectJalaliDay(dayNum)}
+                    className={`h-8 sm:h-8.5 rounded-lg flex items-center justify-center text-xs font-medium transition cursor-pointer ${
+                      isSelected
+                        ? 'bg-purple-600 text-white font-bold shadow-md shadow-purple-900/50'
+                        : isToday
+                        ? 'bg-purple-50 dark:bg-slate-800 border border-purple-500 text-purple-700 dark:text-purple-300 font-bold'
+                        : isFriday
+                        ? 'text-rose-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    {toPersianDigits(dayNum)}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-
-          {/* Quick Shortcuts */}
-          <div className="flex items-center gap-1.5 mb-2.5">
-            <button
-              type="button"
-              onClick={setToday}
-              className="flex-1 py-1 px-2 rounded-lg bg-slate-800 hover:bg-purple-950/60 hover:text-purple-300 border border-slate-700 text-[11px] text-slate-300 transition cursor-pointer"
-            >
-              امروز
-            </button>
-            <button
-              type="button"
-              onClick={setTomorrow}
-              className="flex-1 py-1 px-2 rounded-lg bg-slate-800 hover:bg-purple-950/60 hover:text-purple-300 border border-slate-700 text-[11px] text-slate-300 transition cursor-pointer"
-            >
-              فردا
-            </button>
-          </div>
-
-          {/* Weekday headers */}
-          <div className="grid grid-cols-7 gap-1 text-center mb-1 text-[10px] sm:text-xs font-semibold text-slate-400">
-            {PERSIAN_WEEKDAY_SHORT.map((day, idx) => (
-              <div key={idx} className={idx === 6 ? 'text-rose-400' : ''}>
-                {day}
-              </div>
-            ))}
-          </div>
-
-          {/* Days Grid */}
-          <div className="grid grid-cols-7 gap-1 text-center">
-            {/* Blank padding days */}
-            {Array.from({ length: startWeekday }).map((_, i) => (
-              <div key={`empty_${i}`} className="h-8" />
-            ))}
-
-            {/* Days of Month */}
-            {Array.from({ length: daysInMonth }).map((_, i) => {
-              const dayNum = i + 1;
-              const isSelected =
-                parsedCurrentJalali?.jy === viewYear &&
-                parsedCurrentJalali?.jm === viewMonth &&
-                parsedCurrentJalali?.jd === dayNum;
-              const isToday =
-                todayJalali.jy === viewYear &&
-                todayJalali.jm === viewMonth &&
-                todayJalali.jd === dayNum;
-              const weekdayIndex = (startWeekday + i) % 7;
-              const isFriday = weekdayIndex === 6;
-
-              return (
-                <button
-                  key={`day_${dayNum}`}
-                  type="button"
-                  onClick={() => selectJalaliDay(dayNum)}
-                  className={`h-8 sm:h-8.5 rounded-lg flex items-center justify-center text-xs font-medium transition cursor-pointer ${
-                    isSelected
-                      ? 'bg-purple-600 text-white font-bold shadow-md shadow-purple-900/50'
-                      : isToday
-                      ? 'bg-slate-800 border border-purple-500/80 text-purple-300 font-bold'
-                      : isFriday
-                      ? 'text-rose-400 hover:bg-slate-800'
-                      : 'text-slate-200 hover:bg-slate-800'
-                  }`}
-                >
-                  {toPersianDigits(dayNum)}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </>
+        </>
       )}
     </div>
   );
@@ -352,7 +485,7 @@ export const PersianTimePicker: React.FC<PersianTimePickerProps> = ({
   return (
     <div className={`relative ${className}`} ref={containerRef} dir="rtl">
       {label && (
-        <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
           {label} {required && <span className="text-rose-400">*</span>}
         </label>
       )}
@@ -367,15 +500,15 @@ export const PersianTimePicker: React.FC<PersianTimePickerProps> = ({
             : 'h-11 px-3.5 rounded-xl border flex items-center justify-between cursor-pointer transition select-none'
         } ${
           error
-            ? 'bg-slate-800 border-rose-500/80 text-slate-100 hover:border-rose-400'
+            ? 'bg-white dark:bg-slate-800 border-rose-500/80 text-slate-900 dark:text-slate-100 hover:border-rose-400'
             : isOpen
-            ? 'bg-slate-800 border-purple-500 text-slate-100 ring-1 ring-purple-500/50'
-            : 'bg-slate-800 border-slate-700 text-slate-100 hover:border-slate-600'
+            ? 'bg-white dark:bg-slate-800 border-purple-500 text-slate-900 dark:text-slate-100 ring-1 ring-purple-500/50'
+            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 hover:border-purple-300 dark:hover:border-slate-600'
         }`}
       >
         <div className="flex items-center gap-1.5" dir="ltr">
-          <Clock className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} text-purple-400 shrink-0`} />
-          <span className={`${compact ? 'text-xs font-semibold' : 'text-xs sm:text-sm font-bold'} font-mono tracking-wider text-slate-100`}>
+          <Clock className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} text-purple-600 dark:text-purple-400 shrink-0`} />
+          <span className={`${compact ? 'text-xs font-semibold' : 'text-xs sm:text-sm font-bold'} font-mono tracking-wider text-slate-800 dark:text-slate-100`}>
             {value || '09:00'}
           </span>
         </div>
@@ -392,33 +525,33 @@ export const PersianTimePicker: React.FC<PersianTimePickerProps> = ({
           }}
         >
           <div
-            className="w-full max-w-sm rounded-2xl bg-slate-900 border border-slate-700/90 shadow-2xl shadow-purple-950/60 p-4 text-slate-100 animate-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]"
+            className="w-full max-w-sm rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/90 shadow-2xl p-4 text-slate-800 dark:text-slate-100 animate-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
             dir="rtl"
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-800">
+            <div className="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-purple-950/60 border border-purple-800/40 flex items-center justify-center text-purple-400">
+                <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800/40 flex items-center justify-center text-purple-600 dark:text-purple-400">
                   <Clock className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-100">انتخاب و تنظیم ساعت</h4>
-                  <span className="text-[10px] text-slate-400">ساعت و دقیقه مورد نظر خود را مشخص کنید</span>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">انتخاب و تنظیم ساعت</h4>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">ساعت و دقیقه مورد نظر خود را مشخص کنید</span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 flex items-center justify-center transition cursor-pointer"
+                className="w-7 h-7 rounded-lg bg-purple-50 hover:bg-purple-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-purple-700 dark:text-slate-300 hover:text-purple-900 dark:hover:text-white flex items-center justify-center transition cursor-pointer border border-purple-100 dark:border-transparent"
                 title="بستن"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Large Digital Clock Display with Nudge Buttons (LTR: Hour on Left, Minute on Right) */}
-            <div className="bg-slate-800/80 rounded-xl p-3 border border-slate-700/70 mb-3 flex flex-col items-center">
+            {/* Digital Clock Display with Nudge Buttons (clean white & purple tint in light mode) */}
+            <div className="bg-purple-50/50 dark:bg-slate-800/80 rounded-xl p-3 border border-purple-200/80 dark:border-slate-700/70 mb-3 flex flex-col items-center shadow-xs">
               <div className="flex items-center justify-center gap-4 w-full" dir="ltr">
                 {/* Hours Display & Adjust */}
                 <div className="flex flex-col items-center gap-1">
@@ -426,27 +559,27 @@ export const PersianTimePicker: React.FC<PersianTimePickerProps> = ({
                     <button
                       type="button"
                       onClick={() => updateTime(hours - 1, minutes)}
-                      className="w-7 h-6 rounded bg-slate-700 hover:bg-slate-600 text-xs font-bold text-slate-200 flex items-center justify-center cursor-pointer transition active:scale-95"
+                      className="w-7 h-6 rounded bg-white dark:bg-slate-700 hover:bg-purple-100 dark:hover:bg-slate-600 text-xs font-bold text-purple-700 dark:text-slate-200 border border-purple-200/80 dark:border-transparent flex items-center justify-center cursor-pointer transition active:scale-95 shadow-2xs"
                       title="یک ساعت قبل"
                     >
                       -
                     </button>
-                    <div className="w-14 h-10 rounded-lg bg-slate-900 border border-purple-500/60 flex items-center justify-center font-mono text-xl font-bold text-purple-300 shadow-inner">
+                    <div className="w-14 h-10 rounded-lg bg-white dark:bg-slate-900 border border-purple-400 dark:border-purple-500/60 flex items-center justify-center font-mono text-xl font-bold text-purple-700 dark:text-purple-300 shadow-xs">
                       {String(hours).padStart(2, '0')}
                     </div>
                     <button
                       type="button"
                       onClick={() => updateTime(hours + 1, minutes)}
-                      className="w-7 h-6 rounded bg-slate-700 hover:bg-slate-600 text-xs font-bold text-slate-200 flex items-center justify-center cursor-pointer transition active:scale-95"
+                      className="w-7 h-6 rounded bg-white dark:bg-slate-700 hover:bg-purple-100 dark:hover:bg-slate-600 text-xs font-bold text-purple-700 dark:text-slate-200 border border-purple-200/80 dark:border-transparent flex items-center justify-center cursor-pointer transition active:scale-95 shadow-2xs"
                       title="یک ساعت بعد"
                     >
                       +
                     </button>
                   </div>
-                  <span className="text-[11px] font-bold text-purple-300">ساعت</span>
+                  <span className="text-[11px] font-bold text-purple-700 dark:text-purple-300">ساعت</span>
                 </div>
 
-                <span className="text-2xl font-bold text-purple-400 font-mono self-center mb-4">:</span>
+                <span className="text-2xl font-bold text-purple-600 dark:text-purple-400 font-mono self-center mb-4">:</span>
 
                 {/* Minutes Display & Adjust */}
                 <div className="flex flex-col items-center gap-1">
@@ -454,24 +587,24 @@ export const PersianTimePicker: React.FC<PersianTimePickerProps> = ({
                     <button
                       type="button"
                       onClick={() => updateTime(hours, minutes - 5)}
-                      className="w-7 h-6 rounded bg-slate-700 hover:bg-slate-600 text-xs font-bold text-slate-200 flex items-center justify-center cursor-pointer transition active:scale-95"
+                      className="w-7 h-6 rounded bg-white dark:bg-slate-700 hover:bg-purple-100 dark:hover:bg-slate-600 text-xs font-bold text-purple-700 dark:text-slate-200 border border-purple-200/80 dark:border-transparent flex items-center justify-center cursor-pointer transition active:scale-95 shadow-2xs"
                       title="۵ دقیقه قبل"
                     >
                       -
                     </button>
-                    <div className="w-14 h-10 rounded-lg bg-slate-900 border border-purple-500/60 flex items-center justify-center font-mono text-xl font-bold text-purple-300 shadow-inner">
+                    <div className="w-14 h-10 rounded-lg bg-white dark:bg-slate-900 border border-purple-400 dark:border-purple-500/60 flex items-center justify-center font-mono text-xl font-bold text-purple-700 dark:text-purple-300 shadow-xs">
                       {String(minutes).padStart(2, '0')}
                     </div>
                     <button
                       type="button"
                       onClick={() => updateTime(hours, minutes + 5)}
-                      className="w-7 h-6 rounded bg-slate-700 hover:bg-slate-600 text-xs font-bold text-slate-200 flex items-center justify-center cursor-pointer transition active:scale-95"
+                      className="w-7 h-6 rounded bg-white dark:bg-slate-700 hover:bg-purple-100 dark:hover:bg-slate-600 text-xs font-bold text-purple-700 dark:text-slate-200 border border-purple-200/80 dark:border-transparent flex items-center justify-center cursor-pointer transition active:scale-95 shadow-2xs"
                       title="۵ دقیقه بعد"
                     >
                       +
                     </button>
                   </div>
-                  <span className="text-[11px] font-bold text-purple-300">دقیقه</span>
+                  <span className="text-[11px] font-bold text-purple-700 dark:text-purple-300">دقیقه</span>
                 </div>
               </div>
             </div>
@@ -480,10 +613,10 @@ export const PersianTimePicker: React.FC<PersianTimePickerProps> = ({
             <div className="grid grid-cols-2 gap-2 mb-3 flex-1 min-h-0" dir="ltr">
               {/* Hours Column (Left) */}
               <div className="flex flex-col min-h-0">
-                <span className="text-[11px] font-bold text-slate-300 mb-1 block text-center" dir="rtl">
+                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1 block text-center" dir="rtl">
                   ساعت (۰ تا ۲۳)
                 </span>
-                <div className="h-36 overflow-y-auto rounded-xl bg-slate-950/70 border border-slate-800 p-1 space-y-1">
+                <div className="h-36 overflow-y-auto rounded-xl bg-purple-50/20 dark:bg-slate-950/70 border border-purple-200/70 dark:border-slate-800 p-1 space-y-1 shadow-2xs">
                   {hourOptions.map((h) => {
                     const isSelected = h === hours;
                     return (
@@ -493,8 +626,8 @@ export const PersianTimePicker: React.FC<PersianTimePickerProps> = ({
                         onClick={() => updateTime(h, minutes)}
                         className={`w-full py-1.5 px-2 rounded-lg text-xs font-mono transition flex items-center justify-between cursor-pointer ${
                           isSelected
-                            ? 'bg-purple-600 text-white font-bold shadow-sm shadow-purple-900/60'
-                            : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                            ? 'bg-purple-600 text-white font-bold shadow-sm'
+                            : 'bg-white dark:bg-slate-900/60 text-slate-700 dark:text-slate-300 border border-purple-100/50 dark:border-slate-800/60 hover:bg-purple-50 dark:hover:bg-slate-800/80 hover:text-purple-700 dark:hover:text-white'
                         }`}
                       >
                         <span className="mx-auto font-mono font-bold tracking-wider">
@@ -509,10 +642,10 @@ export const PersianTimePicker: React.FC<PersianTimePickerProps> = ({
 
               {/* Minutes Column (Right) */}
               <div className="flex flex-col min-h-0">
-                <span className="text-[11px] font-bold text-slate-300 mb-1 block text-center" dir="rtl">
+                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1 block text-center" dir="rtl">
                   دقیقه (۰۰ تا ۵۵)
                 </span>
-                <div className="h-36 overflow-y-auto rounded-xl bg-slate-950/70 border border-slate-800 p-1 space-y-1">
+                <div className="h-36 overflow-y-auto rounded-xl bg-purple-50/20 dark:bg-slate-950/70 border border-purple-200/70 dark:border-slate-800 p-1 space-y-1 shadow-2xs">
                   {minuteOptions.map((m) => {
                     const isSelected = m === minutes;
                     return (
@@ -522,8 +655,8 @@ export const PersianTimePicker: React.FC<PersianTimePickerProps> = ({
                         onClick={() => updateTime(hours, m)}
                         className={`w-full py-1.5 px-2 rounded-lg text-xs font-mono transition flex items-center justify-between cursor-pointer ${
                           isSelected
-                            ? 'bg-purple-600 text-white font-bold shadow-sm shadow-purple-900/60'
-                            : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                            ? 'bg-purple-600 text-white font-bold shadow-sm'
+                            : 'bg-white dark:bg-slate-900/60 text-slate-700 dark:text-slate-300 border border-purple-100/50 dark:border-slate-800/60 hover:bg-purple-50 dark:hover:bg-slate-800/80 hover:text-purple-700 dark:hover:text-white'
                         }`}
                       >
                         <span className="mx-auto font-mono font-bold tracking-wider">
@@ -539,7 +672,7 @@ export const PersianTimePicker: React.FC<PersianTimePickerProps> = ({
 
             {/* Quick Presets */}
             <div className="mb-3">
-              <span className="text-[10px] font-semibold text-slate-400 mb-1.5 block">
+              <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-1.5 block">
                 پیش‌فرض‌های پرکاربرد:
               </span>
               <div className="grid grid-cols-4 gap-1">
@@ -551,7 +684,7 @@ export const PersianTimePicker: React.FC<PersianTimePickerProps> = ({
                     className={`py-1 px-1 rounded-lg text-[10px] font-medium border text-center transition cursor-pointer truncate ${
                       value === q.val
                         ? 'bg-purple-600 text-white border-purple-500 font-bold'
-                        : 'bg-slate-800/70 border-slate-700/60 text-slate-300 hover:bg-slate-800 hover:text-white'
+                        : 'bg-white dark:bg-slate-800/70 border-purple-100 dark:border-slate-700/60 text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-slate-800 hover:border-purple-300 hover:text-purple-700 dark:hover:text-white shadow-2xs'
                     }`}
                     title={q.label}
                   >
@@ -562,11 +695,11 @@ export const PersianTimePicker: React.FC<PersianTimePickerProps> = ({
             </div>
 
             {/* Modal Actions */}
-            <div className="pt-2 border-t border-slate-800/80 flex items-center gap-2">
+            <div className="pt-2 border-t border-purple-100 dark:border-slate-800/80 flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-98 text-white text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 shadow-lg shadow-purple-950/50"
+                className="flex-1 py-2.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-98 text-white text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 shadow-lg shadow-purple-600/30"
               >
                 <Check className="w-4 h-4" />
                 <span>تایید و اعمال ساعت</span>
@@ -574,7 +707,7 @@ export const PersianTimePicker: React.FC<PersianTimePickerProps> = ({
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-98 text-slate-300 text-xs font-medium transition cursor-pointer"
+                className="py-2.5 px-3 rounded-xl bg-white hover:bg-purple-50 dark:bg-slate-800 dark:hover:bg-slate-700 active:scale-98 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-xs font-medium transition cursor-pointer shadow-2xs"
               >
                 انصراف
               </button>
