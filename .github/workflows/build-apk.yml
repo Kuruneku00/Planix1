@@ -65,18 +65,21 @@ jobs:
         shell: bash
         run: |
           set -e
+
           npm ci --no-audit --no-fund
 
       - name: Verify Capacitor
         shell: bash
         run: |
           set -e
+
           npx cap --version
 
       - name: Build web application
         shell: bash
         run: |
           set -e
+
           npm run build
 
       - name: Verify web build
@@ -95,6 +98,7 @@ jobs:
         shell: bash
         run: |
           set -e
+
           npx cap sync android
 
       - name: Configure Android SDK
@@ -112,6 +116,8 @@ jobs:
           fi
 
           echo "sdk.dir=$SDK_PATH" > android/local.properties
+
+          echo "Android SDK configured."
 
       - name: Restore release keystore
         shell: bash
@@ -144,6 +150,7 @@ jobs:
           test -f android/app/keystore/release.jks
           test -s android/app/keystore/release.jks
 
+          echo "Keystore file exists:"
           ls -lh android/app/keystore/release.jks
 
           echo "Keystore file verified successfully."
@@ -162,7 +169,6 @@ jobs:
         working-directory: android
         shell: bash
         env:
-          RELEASE_STORE_FILE: keystore/release.jks
           RELEASE_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           RELEASE_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
@@ -171,7 +177,15 @@ jobs:
 
           chmod +x gradlew
 
+          test -f app/keystore/release.jks
+
+          echo "Release keystore found."
+
           ./gradlew assembleRelease \
+            -PRELEASE_STORE_FILE=keystore/release.jks \
+            -PRELEASE_STORE_PASSWORD="$RELEASE_STORE_PASSWORD" \
+            -PRELEASE_KEY_ALIAS="$RELEASE_KEY_ALIAS" \
+            -PRELEASE_KEY_PASSWORD="$RELEASE_KEY_PASSWORD" \
             --stacktrace \
             --info \
             --console=plain \
@@ -190,7 +204,10 @@ jobs:
 
           if [ -z "$APK" ]; then
             echo "ERROR: Release APK was not generated."
+
+            echo "Searching for APK files..."
             find android -type f -name "*.apk" -print || true
+
             exit 1
           fi
 
