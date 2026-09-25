@@ -16,16 +16,41 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+signingConfigs {
+    create("release") {
+        val storeFilePath = project.findProperty("RELEASE_STORE_FILE") as String?
+        val storePasswordValue = project.findProperty("RELEASE_STORE_PASSWORD") as String?
+        val keyAliasValue = project.findProperty("RELEASE_KEY_ALIAS") as String?
+        val keyPasswordValue = project.findProperty("RELEASE_KEY_PASSWORD") as String?
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+        if (storeFilePath != null) {
+            storeFile = file(storeFilePath)
+        }
+
+        if (storePasswordValue != null) {
+            storePassword = storePasswordValue
+        }
+
+        if (keyAliasValue != null) {
+            keyAlias = keyAliasValue
+        }
+
+        if (keyPasswordValue != null) {
+            keyPassword = keyPasswordValue
         }
     }
+}
+
+buildTypes {
+    release {
+        isMinifyEnabled = false
+        signingConfig = signingConfigs.getByName("release")
+        proguardFiles(
+            getDefaultProguardFile("proguard-android-optimize.txt"),
+            "proguard-rules.pro"
+        )
+    }
+}
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
